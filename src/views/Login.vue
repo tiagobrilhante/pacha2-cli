@@ -76,13 +76,12 @@
                     <v-col
                       cols="12"
                     >
-                      <p class="alert alert-danger" v-if="mensagemErro">{{ mensagemErro }}</p>
-
                       <v-btn
-                        type="submit"
-                        elevation="2"
                         color="primary"
-                      >Logar</v-btn>
+                        elevation="2"
+                        type="submit"
+                      >Logar
+                      </v-btn>
 
                     </v-col>
                   </v-row>
@@ -97,72 +96,34 @@
   </v-main>
 </template>
 
-<script>export default {
+<script>import {cpf} from 'cpf-cnpj-validator'
+
+export default {
   data () {
     return {
       usuario: {},
-      mensagemErro: '',
       show1: false
     }
   },
   methods: {
     efetuarLogin () {
-      if (!this.validaCpf(this.usuario.cpf)) {
-        this.mensagemErro = 'CPF inválido !'
+      if (!cpf.isValid(this.usuario.cpf)) {
+        this.$toastr.e(
+          'CPF invalido', 'Erro!'
+        )
       } else {
         this.$store.dispatch('efetuarLogin', this.usuario)
           .then(() => {
             this.$router.push({name: 'home'})
-            this.mensagemErro = ''
           })
           .catch(erro => {
             if (erro.request.status === 401) {
-              this.mensagemErro = 'Login ou senha inválido(s)!'
+              this.$toastr.e(
+                'Login ou senha inválidos', 'Erro!'
+              )
             }
           })
       }
-    },
-    validaCpf (c) {
-      if ((c = c.replace(/[^\d]/g, '')).length !== 11) {
-        return false
-      }
-      if (c === '00000000000' ||
-        c === '11111111111' ||
-        c === '22222222222' ||
-        c === '33333333333' ||
-        c === '44444444444' ||
-        c === '55555555555' ||
-        c === '66666666666' ||
-        c === '77777777777' ||
-        c === '88888888888' ||
-        c === '99999999999') {
-        return false
-      }
-      let r
-      let s = 0
-      let i
-      for (i = 1; i <= 9; i++) {
-        s = s + parseInt(c[i - 1]) * (11 - i)
-      }
-      r = (s * 10) % 11
-      if ((r === 10) || (r === 11)) {
-        r = 0
-      }
-      if (r !== parseInt(c[9])) {
-        return false
-      }
-      s = 0
-      for (i = 1; i <= 10; i++) {
-        s = s + parseInt(c[i - 1]) * (12 - i)
-      }
-      r = (s * 10) % 11
-      if ((r === 10) || (r === 11)) {
-        r = 0
-      }
-      if (r !== parseInt(c[10])) {
-        return false
-      }
-      return true
     }
   }
 }

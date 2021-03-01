@@ -287,6 +287,8 @@ export default {
       v => {
         if (!cpf.isValid(v)) {
           return 'O "CPF" informado não é válido'
+        } else {
+          return true
         }
       }
     ]
@@ -360,63 +362,71 @@ export default {
       })
     },
 
+    mandaPraEdicao () {
+      let ajustaObjeto = {}
+      let objetoParaEnvio = {}
+      let novaOm = []
+      if (typeof this.editedUser.om === 'object') {
+        novaOm = this.editedUser.om
+      } else {
+        for (let i = 0; i < this.oms.length; i++) {
+          if (this.oms[i].id === this.editedUser.om) {
+            novaOm = this.oms[i]
+          }
+        }
+      }
+      ajustaObjeto['id'] = this.editedUser.id
+      ajustaObjeto['nome'] = this.editedUser.nome
+      ajustaObjeto['nome_guerra'] = this.editedUser.nome_guerra
+      ajustaObjeto['posto_grad'] = this.editedUser.posto_grad
+      ajustaObjeto['guerra'] = this.editedUser.posto_grad + ' ' + this.editedUser.nome_guerra
+      ajustaObjeto['cpf'] = this.editedUser.cpf
+      ajustaObjeto['om'] = novaOm
+      ajustaObjeto['tipo'] = this.editedUser.tipo
+      ajustaObjeto['edited_index'] = this.editedIndex
+
+      objetoParaEnvio['id'] = this.editedUser.id
+      objetoParaEnvio['nome'] = this.editedUser.nome
+      objetoParaEnvio['nome_guerra'] = this.editedUser.nome_guerra
+      objetoParaEnvio['posto_grad'] = this.editedUser.posto_grad
+      objetoParaEnvio['cpf'] = this.editedUser.cpf
+      objetoParaEnvio['om_id'] = novaOm.id
+      objetoParaEnvio['tipo'] = this.editedUser.tipo
+
+      this.$http.put('users/' + objetoParaEnvio.id, objetoParaEnvio)
+      // eslint-disable-next-line no-return-assign
+        .then(() => {
+          Object.assign(this.usuarios[ajustaObjeto.edited_index], ajustaObjeto)
+          this.$toastr.s(
+            'Usuário alterado com sucesso', 'Sucesso!'
+          )
+        }, err => {
+          console.log(err)
+          this.$toastr.e(
+            'Não foi possível alterar o Usuário', 'Erro!'
+          )
+        })
+    },
     save () {
       if (this.$refs.form.validate()) {
         if (this.tempCpf !== this.editedUser.cpf) {
-          var novoCpf = this.editedUser.cpf
-
+          let novoCpf = this.editedUser.cpf
           var registro = this.usuarios.find(f => f.cpf === novoCpf)
-
           if (registro) {
             this.$toastr.e(
               'Esse CPF já se encotra cadastrado na base de dados.', 'Erro!'
             )
+          } else {
+            if (this.editedIndex > -1) {
+              this.mandaPraEdicao()
+            } else {
+              this.usuarios.push(this.editedUser)
+            }
+            this.close()
           }
         } else {
           if (this.editedIndex > -1) {
-            let ajustaObjeto = {}
-            let objetoParaEnvio = {}
-            let novaOm = []
-            if (typeof this.editedUser.om === 'object') {
-              novaOm = this.editedUser.om
-            } else {
-              for (let i = 0; i < this.oms.length; i++) {
-                if (this.oms[i].id === this.editedUser.om) {
-                  novaOm = this.oms[i]
-                }
-              }
-            }
-            ajustaObjeto['id'] = this.editedUser.id
-            ajustaObjeto['nome'] = this.editedUser.nome
-            ajustaObjeto['nome_guerra'] = this.editedUser.nome_guerra
-            ajustaObjeto['posto_grad'] = this.editedUser.posto_grad
-            ajustaObjeto['guerra'] = this.editedUser.posto_grad + ' ' + this.editedUser.nome_guerra
-            ajustaObjeto['cpf'] = this.editedUser.cpf
-            ajustaObjeto['om'] = novaOm
-            ajustaObjeto['tipo'] = this.editedUser.tipo
-            ajustaObjeto['edited_index'] = this.editedIndex
-
-            objetoParaEnvio['id'] = this.editedUser.id
-            objetoParaEnvio['nome'] = this.editedUser.nome
-            objetoParaEnvio['nome_guerra'] = this.editedUser.nome_guerra
-            objetoParaEnvio['posto_grad'] = this.editedUser.posto_grad
-            objetoParaEnvio['cpf'] = this.editedUser.cpf
-            objetoParaEnvio['om_id'] = novaOm.id
-            objetoParaEnvio['tipo'] = this.editedUser.tipo
-
-            this.$http.put('users/' + objetoParaEnvio.id, objetoParaEnvio)
-            // eslint-disable-next-line no-return-assign
-              .then(() => {
-                Object.assign(this.usuarios[ajustaObjeto.edited_index], ajustaObjeto)
-                this.$toastr.s(
-                  'Usuário alterado com sucesso', 'Sucesso!'
-                )
-              }, err => {
-                console.log(err)
-                this.$toastr.e(
-                  'Não foi possível alterar o Usuário', 'Erro!'
-                )
-              })
+            this.mandaPraEdicao()
           } else {
             this.usuarios.push(this.editedUser)
           }

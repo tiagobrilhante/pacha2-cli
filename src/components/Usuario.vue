@@ -37,13 +37,19 @@
               </template>
 
               <!--Card de cadastro edição-->
-              <v-card>
-                <v-card-title>
-                  <span class="headline"><i class="fa fa-user"></i> {{ formTitle }}</span>
-                </v-card-title>
 
-                <v-card-text>
-                  <v-container>
+              <v-form
+                lazy-validation
+                ref="form"
+                v-model="valid"
+              >
+                <v-card>
+                  <v-card-title>
+                    <span class="headline"><i class="fa fa-user"></i> {{ formTitle }}</span>
+                  </v-card-title>
+
+                  <v-card-text>
+                    <v-container>
                       <v-row>
                         <!--Nome-->
                         <v-col
@@ -52,9 +58,7 @@
                           sm="4"
                         >
                           <v-text-field
-                            :error-messages="nomeErrors"
-                            @blur="$v.nome.$touch()"
-                            @input="$v.nome.$touch()"
+                            :rules="nomeRules"
                             dense
                             label="Nome"
                             name="nome"
@@ -87,6 +91,7 @@
                           sm="4"
                         >
                           <v-text-field
+                            :rules="nomeGuerraRules"
                             dense
                             label="Nome de Guerra"
                             outlined
@@ -101,6 +106,7 @@
                           sm="4"
                         >
                           <v-text-field
+                            :rules="cpfRules"
                             dense
                             label="CPF"
                             name="cpf"
@@ -145,29 +151,30 @@
                           ></v-select>
                         </v-col>
                       </v-row>
-                  </v-container>
-                </v-card-text>
+                    </v-container>
+                  </v-card-text>
 
-                <!--Botões-->
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <!--Cancelar-->
-                  <v-btn
-                    @click="close"
-                    color="red darken-1"
-                  >
-                    Cancelar
-                  </v-btn>
-                  <!--Salvar-->
-                  <v-btn
-                    @click="save"
-                    color="green darken-1"
+                  <!--Botões-->
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <!--Cancelar-->
+                    <v-btn
+                      @click="close"
+                      color="red darken-1"
+                    >
+                      Cancelar
+                    </v-btn>
+                    <!--Salvar-->
+                    <v-btn
+                      @click="save"
+                      color="green darken-1"
 
-                  >
-                    Salvar
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
+                    >
+                      Salvar
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-form>
             </v-dialog>
 
             <!--Dialog para deletar usuário-->
@@ -212,16 +219,9 @@
     </v-container>
   </v-main>
 </template>
-<script>import {required} from 'vuelidate/lib/validators'
-import {validationMixin} from 'vuelidate'
+<script>import {cpf} from 'cpf-cnpj-validator'
 
 export default {
-  mixins: [validationMixin],
-  validations: {
-    nome: {
-      required
-    }
-  },
   data: () => ({
     posto_grad_options: ['Gen Ex', 'Gen Div', 'Gen Bda', 'Cel', 'Ten Cel', 'Maj', 'Cap', '1º Ten', '2º Ten', 'Asp', 'STen', '1º Sgt', '2º Sgt', '3º Sgt', 'Cb', 'Sd', 'SC'],
     user_type_options: ['Administrador Geral', 'Administrador', 'Chamador'],
@@ -273,21 +273,30 @@ export default {
       om: '',
       tipo: '',
       posto_grad: ''
-    }
-
+    },
+    tempCpf: '',
+    valid: true,
+    nomeRules: [
+      v => !!v || 'O Campo "Nome" é obrigatório'
+    ],
+    nomeGuerraRules: [
+      v => !!v || 'O Campo "Nome de Guerra" é obrigatório'
+    ],
+    cpfRules: [
+      v => !!v || 'O campo "CPF" é obrigatório',
+      v => {
+        if (!cpf.isValid(v)) {
+          return 'O "CPF" informado não é válido'
+        } else {
+          return true
+        }
+      }
+    ]
   }),
-
   computed:
     {
       formTitle () {
         return this.editedIndex === -1 ? 'Novo Usuário' : 'Editar Usuário'
-      },
-      nomeErrors () {
-        const errors = []
-        if (!this.$v.nome.$dirty) return errors
-        !this.$v.nome.required && errors.push('O campo nome é obrigatório.')
-        console.log(errors)
-        return errors
       }
     },
 
@@ -311,6 +320,7 @@ export default {
       this.editedIndex = this.usuarios.indexOf(item)
       this.editedUser = Object.assign({}, item)
       this.dialog = true
+      this.tempCpf = this.editedUser.cpf
     },
 
     deleteUser (item) {
@@ -353,56 +363,68 @@ export default {
     },
 
     save () {
-      this.$v.$touch()
-      if (this.editedIndex > -1) {
-        let ajustaObjeto = {}
-        let objetoParaEnvio = {}
-        let novaOm = []
-        if (typeof this.editedUser.om === 'object') {
-          novaOm = this.editedUser.om
-        } else {
-          for (let i = 0; i < this.oms.length; i++) {
-            if (this.oms[i].id === this.editedUser.om) {
-              novaOm = this.oms[i]
-            }
-          }
-        }
-        ajustaObjeto['id'] = this.editedUser.id
-        ajustaObjeto['nome'] = this.editedUser.nome
-        ajustaObjeto['nome_guerra'] = this.editedUser.nome_guerra
-        ajustaObjeto['posto_grad'] = this.editedUser.posto_grad
-        ajustaObjeto['guerra'] = this.editedUser.posto_grad + ' ' + this.editedUser.nome_guerra
-        ajustaObjeto['cpf'] = this.editedUser.cpf
-        ajustaObjeto['om'] = novaOm
-        ajustaObjeto['tipo'] = this.editedUser.tipo
-        ajustaObjeto['edited_index'] = this.editedIndex
+      if (this.$refs.form.validate()) {
+        if (this.tempCpf !== this.editedUser.cpf) {
+          var novoCpf = this.editedUser.cpf
 
-        objetoParaEnvio['id'] = this.editedUser.id
-        objetoParaEnvio['nome'] = this.editedUser.nome
-        objetoParaEnvio['nome_guerra'] = this.editedUser.nome_guerra
-        objetoParaEnvio['posto_grad'] = this.editedUser.posto_grad
-        objetoParaEnvio['cpf'] = this.editedUser.cpf
-        objetoParaEnvio['om_id'] = novaOm.id
-        objetoParaEnvio['tipo'] = this.editedUser.tipo
+          var registro = this.usuarios.find(f => f.cpf === novoCpf)
 
-        this.$http.put('users/' + objetoParaEnvio.id, objetoParaEnvio)
-        // eslint-disable-next-line no-return-assign
-          .then(() => {
-            console.log(ajustaObjeto)
-            Object.assign(this.usuarios[ajustaObjeto.edited_index], ajustaObjeto)
-            this.$toastr.s(
-              'Usuário alterado com sucesso', 'Sucesso!'
-            )
-          }, err => {
-            console.log(err)
+          if (registro) {
             this.$toastr.e(
-              'Não foi possível alterar o Usuário', 'Erro!'
+              'Esse CPF já se encotra cadastrado na base de dados.', 'Erro!'
             )
-          })
-      } else {
-        this.usuarios.push(this.editedUser)
+          }
+        } else {
+          if (this.editedIndex > -1) {
+            let ajustaObjeto = {}
+            let objetoParaEnvio = {}
+            let novaOm = []
+            if (typeof this.editedUser.om === 'object') {
+              novaOm = this.editedUser.om
+            } else {
+              for (let i = 0; i < this.oms.length; i++) {
+                if (this.oms[i].id === this.editedUser.om) {
+                  novaOm = this.oms[i]
+                }
+              }
+            }
+            ajustaObjeto['id'] = this.editedUser.id
+            ajustaObjeto['nome'] = this.editedUser.nome
+            ajustaObjeto['nome_guerra'] = this.editedUser.nome_guerra
+            ajustaObjeto['posto_grad'] = this.editedUser.posto_grad
+            ajustaObjeto['guerra'] = this.editedUser.posto_grad + ' ' + this.editedUser.nome_guerra
+            ajustaObjeto['cpf'] = this.editedUser.cpf
+            ajustaObjeto['om'] = novaOm
+            ajustaObjeto['tipo'] = this.editedUser.tipo
+            ajustaObjeto['edited_index'] = this.editedIndex
+
+            objetoParaEnvio['id'] = this.editedUser.id
+            objetoParaEnvio['nome'] = this.editedUser.nome
+            objetoParaEnvio['nome_guerra'] = this.editedUser.nome_guerra
+            objetoParaEnvio['posto_grad'] = this.editedUser.posto_grad
+            objetoParaEnvio['cpf'] = this.editedUser.cpf
+            objetoParaEnvio['om_id'] = novaOm.id
+            objetoParaEnvio['tipo'] = this.editedUser.tipo
+
+            this.$http.put('users/' + objetoParaEnvio.id, objetoParaEnvio)
+            // eslint-disable-next-line no-return-assign
+              .then(() => {
+                Object.assign(this.usuarios[ajustaObjeto.edited_index], ajustaObjeto)
+                this.$toastr.s(
+                  'Usuário alterado com sucesso', 'Sucesso!'
+                )
+              }, err => {
+                console.log(err)
+                this.$toastr.e(
+                  'Não foi possível alterar o Usuário', 'Erro!'
+                )
+              })
+          } else {
+            this.usuarios.push(this.editedUser)
+          }
+          this.close()
+        }
       }
-      this.close()
     }
   }
 }

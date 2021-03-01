@@ -287,8 +287,6 @@ export default {
       v => {
         if (!cpf.isValid(v)) {
           return 'O "CPF" informado não é válido'
-        } else {
-          return true
         }
       }
     ]

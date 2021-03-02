@@ -114,6 +114,7 @@
                             dense
                             label="CPF"
                             name="cpf"
+                            required
                             outlined
                             placeholder="Insira o CPF do usuário"
                             v-mask-cpf
@@ -133,6 +134,7 @@
                             item-value="id"
                             label="Om"
                             name="om"
+                            required
                             outlined
                             placeholder="Selecione a Om do usuário"
                             v-model="om"
@@ -150,6 +152,7 @@
                             label="Tipo de Usuário"
                             name="tipo"
                             outlined
+                            required
                             placeholder="Selecione o tipo de usuário"
                             v-model="tipo"
                           ></v-select>
@@ -172,7 +175,6 @@
                     <v-btn
                       @click="save"
                       color="green darken-1"
-
                     >
                       Salvar
                     </v-btn>

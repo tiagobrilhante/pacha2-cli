@@ -230,16 +230,32 @@ import {validationMixin} from 'vuelidate'
 import {required} from 'vuelidate/lib/validators'
 
 let validaCpf = (value) => cpf.isValid(value)
-let uniqueCpf = () => {
-  return true
-}
 
 export default {
   mixins: [validationMixin],
   validations: {
     nome: {required},
     nome_guerra: {required},
-    cpf: {required, validaCpf, uniqueCpf}
+    cpf: {
+      required,
+      validaCpf,
+      async isUniqueCpf (value) {
+        let objetoEnvio = {}
+        objetoEnvio['id'] = this.id
+        objetoEnvio['cpf'] = value
+        this.$http.post('users/cpf', objetoEnvio)
+          .then(response => {
+            if (response.data === 0) {
+              console.log('tá ok')
+              return true
+            } else {
+              console.log('não pode usar esse cpf')
+              return false
+            }
+          })
+          .catch(erro => console.log(erro))
+      }
+    }
   },
   data: () => ({
     posto_grad_options: ['Gen Ex', 'Gen Div', 'Gen Bda', 'Cel', 'Ten Cel', 'Maj', 'Cap', '1º Ten', '2º Ten', 'Asp', 'STen', '1º Sgt', '2º Sgt', '3º Sgt', 'Cb', 'Sd', 'SC'],
@@ -326,7 +342,7 @@ export default {
         if (!this.$v.cpf.$dirty) return errors
         !this.$v.cpf.required && errors.push('O Campo "CPF" não pode ficar em branco!')
         !this.$v.cpf.validaCpf && errors.push('O CPF informado não é valido!')
-        !this.$v.cpf.uniqueCpf && errors.push('O CPF informado já está em uso!')
+        !this.$v.cpf.isUniqueCpf && errors.push('O CPF informado já está em uso!')
         return errors
       }
     },

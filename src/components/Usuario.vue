@@ -243,17 +243,17 @@ export default {
         let objetoEnvio = {}
         objetoEnvio['id'] = this.id
         objetoEnvio['cpf'] = value
+        let resposta = await
         this.$http.post('users/cpf', objetoEnvio)
           .then(response => {
             if (response.data === 0) {
-              console.log('tá ok')
               return true
             } else {
-              console.log('não pode usar esse cpf')
               return false
             }
           })
           .catch(erro => console.log(erro))
+        return resposta
       }
     }
   },

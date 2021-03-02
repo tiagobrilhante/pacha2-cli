@@ -324,9 +324,9 @@ export default {
       cpfErrors () {
         const errors = []
         if (!this.$v.cpf.$dirty) return errors
-        !this.$v.cpf.required && errors.push('O Campo "CPF" não pode ficar em branco! ')
-        !this.$v.cpf.validaCpf && errors.push('O CPF informado não é valido! ')
-        !this.$v.cpf.uniqueCpf && errors.push('O CPF informado já está em uso! ')
+        !this.$v.cpf.required && errors.push('O Campo "CPF" não pode ficar em branco!')
+        !this.$v.cpf.validaCpf && errors.push('O CPF informado não é valido!')
+        !this.$v.cpf.uniqueCpf && errors.push('O CPF informado já está em uso!')
         return errors
       }
     },

@@ -38,11 +38,7 @@
 
               <!--Card de cadastro edição-->
 
-              <v-form
-                lazy-validation
-                ref="form"
-                v-model="valid"
-              >
+              <form>
                 <v-card>
                   <v-card-title>
                     <span class="headline"><i class="fa fa-user"></i> {{ formTitle }}</span>
@@ -58,14 +54,16 @@
                           sm="4"
                         >
                           <v-text-field
-                            :rules="nomeRules"
+                            :error-messages="nomeErrors"
+                            @blur="$v.nome.$touch()"
+                            @input="$v.nome.$touch()"
                             dense
                             label="Nome"
                             name="nome"
                             outlined
                             placeholder="Insira o nome completo"
                             required
-                            v-model="editedUser.nome"
+                            v-model="nome"
                           ></v-text-field>
                         </v-col>
                         <!--Posto Grad-->
@@ -81,7 +79,7 @@
                             name="posto_grad"
                             outlined
                             placeholder="Insira o Posto/Grad"
-                            v-model="editedUser.posto_grad"
+                            v-model="posto_grad"
                           ></v-select>
                         </v-col>
                         <!--Nome de Guerra-->
@@ -91,12 +89,16 @@
                           sm="4"
                         >
                           <v-text-field
-                            :rules="nomeGuerraRules"
+                            :error-messages="nomeGuerraErrors"
+                            @blur="$v.nome_guerra.$touch()"
+                            @input="$v.nome_guerra.$touch()"
                             dense
                             label="Nome de Guerra"
+                            name="nome_guerra"
                             outlined
                             placeholder="Insira o nome de guerra"
-                            v-model="editedUser.nome_guerra"
+                            required
+                            v-model="nome_guerra"
                           ></v-text-field>
                         </v-col>
                         <!--CPF-->
@@ -106,14 +108,16 @@
                           sm="4"
                         >
                           <v-text-field
-                            :rules="cpfRules"
+                            :error-messages="cpfErrors"
+                            @blur="$v.cpf.$touch()"
+                            @input="$v.cpf.$touch()"
                             dense
                             label="CPF"
                             name="cpf"
                             outlined
                             placeholder="Insira o CPF do usuário"
                             v-mask-cpf
-                            v-model="editedUser.cpf"
+                            v-model="cpf"
                           ></v-text-field>
                         </v-col>
                         <!--OM-->
@@ -131,7 +135,7 @@
                             name="om"
                             outlined
                             placeholder="Selecione a Om do usuário"
-                            v-model="editedUser.om"
+                            v-model="om"
                           ></v-select>
                         </v-col>
                         <!--Tipo-->
@@ -147,7 +151,7 @@
                             name="tipo"
                             outlined
                             placeholder="Selecione o tipo de usuário"
-                            v-model="editedUser.tipo"
+                            v-model="tipo"
                           ></v-select>
                         </v-col>
                       </v-row>
@@ -174,7 +178,7 @@
                     </v-btn>
                   </v-card-actions>
                 </v-card>
-              </v-form>
+              </form>
             </v-dialog>
 
             <!--Dialog para deletar usuário-->
@@ -220,8 +224,19 @@
   </v-main>
 </template>
 <script>import {cpf} from 'cpf-cnpj-validator'
+import {validationMixin} from 'vuelidate'
+import {required} from 'vuelidate/lib/validators'
+
+let validaCpf = (value) => cpf.isValid(value)
+// let uniqueCpf = (value) => this.usuarios.find(f => f.cpf === value)
 
 export default {
+  mixins: [validationMixin],
+  validations: {
+    nome: {required},
+    nome_guerra: {required},
+    cpf: {required, validaCpf}
+  },
   data: () => ({
     posto_grad_options: ['Gen Ex', 'Gen Div', 'Gen Bda', 'Cel', 'Ten Cel', 'Maj', 'Cap', '1º Ten', '2º Ten', 'Asp', 'STen', '1º Sgt', '2º Sgt', '3º Sgt', 'Cb', 'Sd', 'SC'],
     user_type_options: ['Administrador Geral', 'Administrador', 'Chamador'],
@@ -256,15 +271,15 @@ export default {
       }
     ],
     editedIndex: -1,
-    editedUser: {
-      nome: '',
-      nome_guerra: '',
-      guerra: '',
-      cpf: '',
-      om: '',
-      tipo: '',
-      posto_grad: ''
-    },
+    id: '',
+    nome: '',
+    nome_guerra: '',
+    guerra: '',
+    cpf: '',
+    om: '',
+    tipo: '',
+    posto_grad: '',
+    tempCpf: '',
     defaultUser: {
       nome: '',
       nome_guerra: '',
@@ -274,29 +289,40 @@ export default {
       tipo: '',
       posto_grad: ''
     },
-    tempCpf: '',
-    valid: true,
-    nomeRules: [
-      v => !!v || 'O Campo "Nome" é obrigatório'
-    ],
-    nomeGuerraRules: [
-      v => !!v || 'O Campo "Nome de Guerra" é obrigatório'
-    ],
-    cpfRules: [
-      v => !!v || 'O campo "CPF" é obrigatório',
-      v => {
-        if (!cpf.isValid(v)) {
-          return 'O "CPF" informado não é válido'
-        } else {
-          return true
-        }
-      }
-    ]
+    editedUser: {
+      id: '',
+      nome: '',
+      nome_guerra: '',
+      guerra: '',
+      cpf: '',
+      om: '',
+      tipo: '',
+      posto_grad: ''
+    }
   }),
   computed:
     {
       formTitle () {
         return this.editedIndex === -1 ? 'Novo Usuário' : 'Editar Usuário'
+      },
+      nomeErrors () {
+        const errors = []
+        if (!this.$v.nome.$dirty) return errors
+        !this.$v.nome.required && errors.push('O Campo "Nome" não pode ficar em branco! ')
+        return errors
+      },
+      nomeGuerraErrors () {
+        const errors = []
+        if (!this.$v.nome_guerra.$dirty) return errors
+        !this.$v.nome_guerra.required && errors.push('O Campo "Nome de Guerra" não pode ficar em branco! ')
+        return errors
+      },
+      cpfErrors () {
+        const errors = []
+        if (!this.$v.cpf.$dirty) return errors
+        !this.$v.cpf.required && errors.push('O Campo "CPF" não pode ficar em branco! ')
+        !this.$v.cpf.validaCpf && errors.push('O CPF informado não é valido! ')
+        return errors
       }
     },
 
@@ -318,6 +344,13 @@ export default {
     editUser (item) {
       this.editedIndex = this.usuarios.indexOf(item)
       this.editedUser = Object.assign({}, item)
+      this.id = this.editedUser.id
+      this.nome = this.editedUser.nome
+      this.nome_guerra = this.editedUser.nome_guerra
+      this.posto_grad = this.editedUser.posto_grad
+      this.cpf = this.editedUser.cpf
+      this.om = this.editedUser.om.id
+      this.tipo = this.editedUser.tipo
       this.dialog = true
       this.tempCpf = this.editedUser.cpf
     },
@@ -365,33 +398,34 @@ export default {
       if (this.editedIndex > -1) {
         let ajustaObjeto = {}
         let objetoParaEnvio = {}
+
         let novaOm = []
-        if (typeof this.editedUser.om === 'object') {
-          novaOm = this.editedUser.om
+        if (typeof this.om === 'object') {
+          novaOm = this.om
         } else {
           for (let i = 0; i < this.oms.length; i++) {
-            if (this.oms[i].id === this.editedUser.om) {
+            if (this.oms[i].id === this.om) {
               novaOm = this.oms[i]
             }
           }
         }
-        ajustaObjeto['id'] = this.editedUser.id
-        ajustaObjeto['nome'] = this.editedUser.nome
-        ajustaObjeto['nome_guerra'] = this.editedUser.nome_guerra
-        ajustaObjeto['posto_grad'] = this.editedUser.posto_grad
-        ajustaObjeto['guerra'] = this.editedUser.posto_grad + ' ' + this.editedUser.nome_guerra
-        ajustaObjeto['cpf'] = this.editedUser.cpf
+        ajustaObjeto['id'] = this.id
+        ajustaObjeto['nome'] = this.nome
+        ajustaObjeto['nome_guerra'] = this.nome_guerra
+        ajustaObjeto['posto_grad'] = this.posto_grad
+        ajustaObjeto['guerra'] = this.posto_grad + ' ' + this.nome_guerra
+        ajustaObjeto['cpf'] = this.cpf
         ajustaObjeto['om'] = novaOm
-        ajustaObjeto['tipo'] = this.editedUser.tipo
+        ajustaObjeto['tipo'] = this.tipo
         ajustaObjeto['edited_index'] = this.editedIndex
 
-        objetoParaEnvio['id'] = this.editedUser.id
-        objetoParaEnvio['nome'] = this.editedUser.nome
-        objetoParaEnvio['nome_guerra'] = this.editedUser.nome_guerra
-        objetoParaEnvio['posto_grad'] = this.editedUser.posto_grad
-        objetoParaEnvio['cpf'] = this.editedUser.cpf
+        objetoParaEnvio['id'] = this.id
+        objetoParaEnvio['nome'] = this.nome
+        objetoParaEnvio['nome_guerra'] = this.nome_guerra
+        objetoParaEnvio['posto_grad'] = this.posto_grad
+        objetoParaEnvio['cpf'] = this.cpf
         objetoParaEnvio['om_id'] = novaOm.id
-        objetoParaEnvio['tipo'] = this.editedUser.tipo
+        objetoParaEnvio['tipo'] = this.tipo
 
         this.$http.put('users/' + objetoParaEnvio.id, objetoParaEnvio)
         // eslint-disable-next-line no-return-assign
@@ -413,12 +447,12 @@ export default {
     },
 
     save () {
-      if (this.$refs.form.validate()) {
-        if (this.tempCpf !== this.editedUser.cpf) {
-          let novoCpf = this.editedUser.cpf
+      this.$v.$touch()
+      if (!this.$v.$invalid) {
+        if (this.tempCpf !== this.cpf) {
+          let novoCpf = this.cpf
           var registro = this.usuarios.find(f => f.cpf === novoCpf)
           if (registro) {
-            this.rules.push('Esse CPF...')
             this.$toastr.e(
               'Esse CPF já se encotra cadastrado na base de dados.', 'Erro!'
             )

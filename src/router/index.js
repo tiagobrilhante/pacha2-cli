@@ -21,7 +21,7 @@ const routes = [
   {
     path: '/cadastrar',
     name: 'novo.usuario',
-    component: () => import(/* webpackChunkName: "registrar" */ '../views/novoUsuario')
+    component: () => import(/* webpackChunkName: "registrar" */ '../views/olds/novoUsuario')
   },
   {
     path: '/login',

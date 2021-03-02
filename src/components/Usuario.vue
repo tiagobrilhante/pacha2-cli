@@ -114,9 +114,9 @@
                             dense
                             label="CPF"
                             name="cpf"
-                            required
                             outlined
                             placeholder="Insira o CPF do usuário"
+                            required
                             v-mask-cpf
                             v-model="cpf"
                           ></v-text-field>
@@ -134,9 +134,9 @@
                             item-value="id"
                             label="Om"
                             name="om"
-                            required
                             outlined
                             placeholder="Selecione a Om do usuário"
+                            required
                             v-model="om"
                           ></v-select>
                         </v-col>
@@ -152,8 +152,8 @@
                             label="Tipo de Usuário"
                             name="tipo"
                             outlined
-                            required
                             placeholder="Selecione o tipo de usuário"
+                            required
                             v-model="tipo"
                           ></v-select>
                         </v-col>
@@ -230,14 +230,16 @@ import {validationMixin} from 'vuelidate'
 import {required} from 'vuelidate/lib/validators'
 
 let validaCpf = (value) => cpf.isValid(value)
-// let uniqueCpf = (value) => this.usuarios.find(f => f.cpf === value)
+let uniqueCpf = () => {
+  return true
+}
 
 export default {
   mixins: [validationMixin],
   validations: {
     nome: {required},
     nome_guerra: {required},
-    cpf: {required, validaCpf}
+    cpf: {required, validaCpf, uniqueCpf}
   },
   data: () => ({
     posto_grad_options: ['Gen Ex', 'Gen Div', 'Gen Bda', 'Cel', 'Ten Cel', 'Maj', 'Cap', '1º Ten', '2º Ten', 'Asp', 'STen', '1º Sgt', '2º Sgt', '3º Sgt', 'Cb', 'Sd', 'SC'],
@@ -324,6 +326,7 @@ export default {
         if (!this.$v.cpf.$dirty) return errors
         !this.$v.cpf.required && errors.push('O Campo "CPF" não pode ficar em branco! ')
         !this.$v.cpf.validaCpf && errors.push('O CPF informado não é valido! ')
+        !this.$v.cpf.uniqueCpf && errors.push('O CPF informado já está em uso! ')
         return errors
       }
     },
@@ -443,7 +446,14 @@ export default {
             )
           })
       } else {
-        this.usuarios.push(this.editedUser)
+        let objetoParaEnvio = {}
+        objetoParaEnvio['nome'] = this.nome
+        objetoParaEnvio['nome_guerra'] = this.nome_guerra
+        objetoParaEnvio['posto_grad'] = this.posto_grad
+        objetoParaEnvio['cpf'] = this.cpf
+        objetoParaEnvio['om_id'] = this.om
+        objetoParaEnvio['tipo'] = this.tipo
+        this.usuarios.push(objetoParaEnvio)
       }
       this.close()
     },

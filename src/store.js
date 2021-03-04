@@ -7,28 +7,28 @@ Vue.use(Vuex)
 
 const estado = {
   token: null,
-  usuario: {}
+  usuarioLogado: {}
 }
 
 const mutations = {
-  DEFINIR_USUARIO_LOGADO (state, {token, usuario}) {
+  DEFINIR_USUARIO_LOGADO (state, {token, usuarioLogado}) {
     state.token = token
-    state.usuario = usuario
+    state.usuarioLogado = usuarioLogado
   },
   DESLOGAR_USUARIO (state) {
     state.token = null
-    state.usuario = {}
+    state.usuarioLogado = {}
   }
 }
 
 const actions = {
-  efetuarLogin ({commit}, usuario) {
+  efetuarLogin ({commit}, usuarioLogado) {
     return new Promise((resolve, reject) => {
-      http.post('/login', usuario)
+      http.post('/login', usuarioLogado)
         .then(response => {
           commit('DEFINIR_USUARIO_LOGADO', {
             token: response.data.access_token,
-            usuario: response.data.user
+            usuarioLogado: response.data.user
           })
           resolve(response.data)
         })
@@ -41,7 +41,17 @@ const actions = {
 }
 
 const getters = {
-  usuarioEstaLogado: state => Boolean(state.token)
+  usuarioEstaLogado: state => Boolean(state.token),
+  usuarioResetado: state => {
+    if (state.usuarioLogado.reset === 1) {
+      return false
+    } else {
+      return true
+    }
+  },
+  usuarioLogado: state => {
+    return state.usuarioLogado
+  }
 }
 
 const vuexLocal = new VuexPersistence({

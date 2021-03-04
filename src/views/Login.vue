@@ -113,8 +113,12 @@ export default {
         )
       } else {
         this.$store.dispatch('efetuarLogin', this.usuario)
-          .then(() => {
-            this.$router.push({name: 'home'})
+          .then(response => {
+            if (response.user.reset) {
+              this.$router.push({name: 'reset'})
+            } else {
+              this.$router.push({name: 'home'})
+            }
           })
           .catch(erro => {
             if (erro.request.status === 401) {

@@ -6,7 +6,7 @@
   </v-app>
 </template>
 
-<script>import BarraNavegacao from '@/components/BarraNavegacao'
+<script>import BarraNavegacao from '@/components/barra-navegacao/BarraNavegacao'
 
 export default {
 

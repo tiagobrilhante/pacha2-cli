@@ -1,20 +1,12 @@
 <template>
-  <div class="row">
-    <div class="container pt-4">
-      <div class="alert alert-dark text-center"><h2><i class="fa fa-user"></i> Gerenciamento de Usuários</h2></div>
-      <Botao estilo="primary" icone="plus" rotulo=" Cadastrar Novo Usuário" tipo="button"/>
-      <Usuario :usuarios="usuarios" :oms="oms"/>
-    </div>
-  </div>
+  <Usuario :oms="oms" :usuarios="usuarios"/>
 </template>
 
 <script>import Usuario from '../components/Usuario.vue'
-import Botao from '../components/shared/botao/Botao'
 
 export default {
   components: {
-    Usuario,
-    Botao
+    Usuario
   },
   data () {
     return {

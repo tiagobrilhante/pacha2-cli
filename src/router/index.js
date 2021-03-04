@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Usuarios from '../views/Usuarios.vue'
 import Home from '../views/Home.vue'
+// import Reset from '../views/Reset.vue'
 import Login from '../views/Login.vue'
 import store from '@/store'
 
@@ -14,14 +15,15 @@ const routes = [
     component: Home
   },
   {
+    path: '/reset',
+    name: 'reset',
+    // component: Reset
+    component: () => import(/* webpackChunkName: "Reset" */ '../views/Reset.vue')
+  },
+  {
     path: '/usuarios',
     name: 'usuarios',
     component: Usuarios
-  },
-  {
-    path: '/cadastrar',
-    name: 'novo.usuario',
-    component: () => import(/* webpackChunkName: "registrar" */ '../views/olds/novoUsuario')
   },
   {
     path: '/login',

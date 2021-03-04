@@ -1,8 +1,9 @@
 <template>
-  <Usuario :oms="oms" :usuarios="usuarios"/>
+  <Usuario :oms="oms" :tipos="tipos" :usuarios="usuarios"/>
 </template>
 
 <script>import Usuario from '../components/Usuario.vue'
+import {mapGetters} from 'vuex'
 
 export default {
   components: {
@@ -11,7 +12,8 @@ export default {
   data () {
     return {
       usuarios: [],
-      oms: []
+      oms: [],
+      tipos: []
     }
   },
   mounted () {
@@ -22,11 +24,22 @@ export default {
       })
       .catch(erro => console.log(erro))
 
-    this.$http.get('om')
+    this.$http.get('om/disponivel')
       .then(response => {
-        self.oms = response.data.data
+        self.oms = response.data
       })
       .catch(erro => console.log(erro))
+
+    this.$http.post('users/tiposdisponiveis', this.usuarioLogado.id)
+      .then(response => {
+        self.tipos = response.data
+      })
+      .catch(erro => console.log(erro))
+  },
+  computed: {
+
+    ...mapGetters(['usuarioLogado'])
+
   }
 }
 </script>

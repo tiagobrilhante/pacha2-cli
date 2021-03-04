@@ -166,7 +166,7 @@
                             :error-messages="tipoErrors"
                             @blur="$v.tipo.$touch()"
                             @input="$v.tipo.$touch()"
-                            :items="user_type_options"
+                            :items="tipos"
                             dense
                             label="Tipo de Usuário"
                             name="tipo"
@@ -373,7 +373,6 @@ export default {
 
   data: () => ({
     posto_grad_options: ['Gen Ex', 'Gen Div', 'Gen Bda', 'Cel', 'Ten Cel', 'Maj', 'Cap', '1º Ten', '2º Ten', 'Asp', 'STen', '1º Sgt', '2º Sgt', '3º Sgt', 'Cb', 'Sd', 'SC'],
-    user_type_options: ['Administrador Geral', 'Administrador', 'Chamador'],
     dialog: false,
     search: '',
     dialogDelete: false,
@@ -501,7 +500,8 @@ export default {
 
   props: {
     usuarios: Array,
-    oms: Array
+    oms: Array,
+    tipos: Array
   },
 
   methods: {
@@ -515,6 +515,7 @@ export default {
       this.cpf = this.editedUser.cpf
       this.om = this.editedUser.om.id
       this.tipo = this.editedUser.tipo
+      this.$v.$touch()
       this.dialog = true
     },
 
@@ -629,7 +630,6 @@ export default {
     },
 
     save () {
-      this.$v.$touch()
       if (!this.$v.$invalid) {
         if (this.editedIndex > -1) {
           let ajustaObjeto = {}

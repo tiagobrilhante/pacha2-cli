@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-menu
-      rounded="xl"
+      rounded="b-xl"
       offset-y
       open-on-hover
     >

@@ -26,8 +26,8 @@
                 <v-container>
                   <v-row>
                     <v-col
-                      cols="6"
-                      offset="3"
+                      cols="8"
+                      offset="2"
                     >
                       <v-banner
                         elevation="10"
@@ -42,14 +42,14 @@
 
                   <v-row>
                     <v-col
-                      cols="6"
-                      offset="3"
+                      cols="8"
+                      offset="2"
                     >
                       <v-card
                         elevation="10"
                         rounded="lg"
                       >
-                        <v-container>
+                        <v-container fluid>
                           <!--Password-->
                           <v-row class="m-0">
                             <v-col
@@ -81,12 +81,19 @@
                               cols="12"
                             >
                               <v-btn
+                                block
                                 color="primary"
                                 elevation="2"
                                 type="submit"
                               >Alterar senha
                               </v-btn>
 
+                            </v-col>
+
+                            <v-col>
+                            <v-alert
+                              type="warning"
+                            > Ao clicar em "ALTERAR SENHA", você será levado novamente para a tela de Login</v-alert>
                             </v-col>
                           </v-row>
                         </v-container>

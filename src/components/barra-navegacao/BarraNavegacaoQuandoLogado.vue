@@ -24,7 +24,7 @@
     <v-menu
       offset-y
       open-on-hover
-      rounded="xl"
+      rounded="b-xl"
       v-if="usuarioResetado"
     >
       <template v-slot:activator="{ on, attrs }">

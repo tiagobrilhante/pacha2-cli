@@ -12,7 +12,7 @@
             rounded="lg"
           >
             <v-row>
-              <v-col cols="10" offset="1" >
+              <v-col cols="10" offset="1">
                 <div class="text-center pt-5">
                   <h1>Bem-vindo ao sistema PaCha!</h1>
                   <p>Sistema web para painéis de chamada</p>
@@ -31,6 +31,9 @@
 
 export default {
   name: 'home',
-  mixins: [logoutMixin]
+  mixins: [logoutMixin],
+  mounted () {
+  },
+  methods: {}
 }
 </script>

@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Usuarios from '../views/Usuarios.vue'
+import Paineis from '../views/Paineis'
+import Guiches from '../views/Guiches'
+import Preferences from '../views/Preferences'
 import Home from '../views/Home.vue'
 // import Reset from '../views/Reset.vue'
 import Login from '../views/Login.vue'
@@ -24,6 +27,21 @@ const routes = [
     path: '/usuarios',
     name: 'usuarios',
     component: Usuarios
+  },
+  {
+    path: '/panels',
+    name: 'painéis',
+    component: Paineis
+  },
+  {
+    path: '/guiches',
+    name: 'Guichês',
+    component: Guiches
+  },
+  {
+    path: '/preferences',
+    name: 'Preferências',
+    component: Preferences
   },
   {
     path: '/login',

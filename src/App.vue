@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id="inspire">
     <vue-confirm-dialog></vue-confirm-dialog>
     <BarraNavegacao/>
     <router-view/>

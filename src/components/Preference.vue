@@ -369,8 +369,7 @@ export default {
 
   props: {
     parametrosnormal: Array,
-    parametrosprioridade: Array,
-    oms: Array
+    parametrosprioridade: Array
   },
 
   data: () => ({

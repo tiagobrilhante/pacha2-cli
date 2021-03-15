@@ -73,10 +73,10 @@
 
             <v-row>
               <v-col>
-                Senha Inicial - SENHA
+                Senha Inicial - {{ num_ini_normal }}
               </v-col>
-              <v-col>Data considerada: DATA</v-col>
-              <v-col>Responsável: RESP</v-col>
+              <v-col>Data considerada: {{ data_ini_normal }}</v-col>
+              <v-col>Responsável: {{ resp_normal }}</v-col>
             </v-row>
 
           </v-alert>
@@ -93,71 +93,80 @@
               Formulário de Ajuste de Atendimento Normal
             </v-card-title>
             <v-card-text>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    :error-messages="numeroInicialErrors"
-                    @blur="$v.numero_inicial.$touch()"
-                    @input="$v.numero_inicial.$touch()"
-                    dense
-                    label="Senha Inicial"
-                    name="numero_inicial"
-                    outlined
-                    placeholder="Insira o número inicial do dia"
-                    required
-                    v-model="numero_inicial"
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col>
-                  <v-menu
-                    :close-on-content-click="false"
-                    :nudge-right="0"
-                    min-width="auto"
-                    offset-y
-                    transition="scale-transition"
-                    v-model="menu_data_normal"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                        label="Data de referência de atendimento"
-                        prepend-icon="mdi-calendar"
-                        readonly
-                        v-bind="attrs"
-                        v-model="computedDateFormattedNormal"
-                        v-on="on"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      @input="menu_data_normal = false"
-                      v-model="data_ref_normal"
-                    ></v-date-picker>
-                  </v-menu>
-                </v-col>
-              </v-row>
-              <!--Salvar-->
-              <v-btn
-                class="mb-2"
-                color="primary"
-                dark
-              >
-                <v-icon class="mr-5">
-                  mdi-check
-                </v-icon>
-                Salvar
-              </v-btn>
-              <!--cancelar-->
-              <v-btn
-                @click='closeAreaForm("norm")'
-                class="mb-2"
-                color="error"
-                dark
-              >
-                <v-icon class="mr-5">
-                  mdi-cancel
-                </v-icon>
-                Cancelar
-              </v-btn>
+              <v-form @submit.prevent="saveNormal">
+                <v-row>
+
+                  <!--numero inicial normal-->
+                  <v-col>
+                    <v-text-field
+                      :error-messages="numeroInicialNormalErrors"
+                      @blur="$v.numero_inicial_normal.$touch()"
+                      @input="$v.numero_inicial_normal.$touch()"
+                      dense
+                      label="Número Inicial"
+                      name="numero_inicial"
+                      outlined
+                      placeholder="Insira o número inicial do dia"
+                      required
+                      v-model="numero_inicial_normal"
+                    >
+                    </v-text-field>
+                  </v-col>
+
+                  <!--data de referência normal-->
+                  <v-col>
+                    <v-menu
+                      :close-on-content-click="false"
+                      :nudge-right="0"
+                      min-width="auto"
+                      offset-y
+                      transition="scale-transition"
+                      v-model="menu_data_normal"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-text-field
+                          label="Data de referência de atendimento"
+                          prepend-icon="mdi-calendar"
+                          readonly
+                          v-bind="attrs"
+                          v-model="computedDateFormattedNormal"
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker
+                        @input="menu_data_normal = false"
+                        v-model="data_ref_normal"
+                      ></v-date-picker>
+                    </v-menu>
+                  </v-col>
+
+                </v-row>
+                <!--Salvar-->
+                <v-btn
+                  class="mb-2"
+                  color="primary"
+                  dark
+                  type="submit"
+
+                >
+                  <v-icon class="mr-5">
+                    mdi-check
+                  </v-icon>
+                  Salvar
+                </v-btn>
+                <!--cancelar-->
+                <v-btn
+                  @click='closeAreaForm("norm")'
+                  class="mb-2"
+                  color="error"
+                  dark
+                >
+                  <v-icon class="mr-5">
+                    mdi-cancel
+                  </v-icon>
+                  Cancelar
+                </v-btn>
+              </v-form>
 
             </v-card-text>
 
@@ -180,10 +189,10 @@
             ></v-divider>
             <v-row>
               <v-col>
-                Senha Inicial - SENHA
+                Senha Inicial - {{ num_ini_prioridade }}
               </v-col>
-              <v-col>Data considerada: DATA</v-col>
-              <v-col>Responsável: RESP</v-col>
+              <v-col>Data considerada: {{ data_ini_prioridade }}</v-col>
+              <v-col>Responsável: {{ resp_prioridade }}</v-col>
             </v-row>
 
           </v-alert>
@@ -200,69 +209,79 @@
               Formulário de Ajuste de Atendimento Prioritário
             </v-card-title>
             <v-card-text>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    dense
-                    label="Senha Inicial"
-                    name="numero_inicial"
-                    outlined
-                    placeholder="Insira o número inicial do dia"
-                    required
-                    v-model="numero_inicial"
-                  >
-                  </v-text-field>
-                </v-col>
-                <!--data_prioridade-->
-                <v-col>
-                  <v-menu
-                    :close-on-content-click="false"
-                    :nudge-right="0"
-                    min-width="auto"
-                    offset-y
-                    transition="scale-transition"
-                    v-model="menu_data_prioridade"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                        label="Data de referência de atendimento"
-                        prepend-icon="mdi-calendar"
-                        readonly
-                        v-bind="attrs"
-                        v-model="computedDateFormattedPrioridade"
-                        v-on="on"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      @input="menu_data_prioridade = false"
-                      v-model="data_ref_prioridade"
-                    ></v-date-picker>
-                  </v-menu>
-                </v-col>
-              </v-row>
-              <!--Salvar -->
-              <v-btn
-                class="mb-2"
-                color="primary"
-                dark
-              >
-                <v-icon class="mr-5">
-                  mdi-check
-                </v-icon>
-                Salvar
-              </v-btn>
-              <!--cancelar-->
-              <v-btn
-                @click='closeAreaForm("prio")'
-                class="mb-2"
-                color="error"
-                dark
-              >
-                <v-icon class="mr-5">
-                  mdi-cancel
-                </v-icon>
-                Cancelar
-              </v-btn>
+              <v-form @submit.prevent="savePrioridade">
+                <v-row>
+
+                  <!--Numero inicial prioridade-->
+                  <v-col>
+                    <v-text-field
+                      :error-messages="numeroInicialPrioridadeErrors"
+                      @blur="$v.numero_inicial_prioridade.$touch()"
+                      @input="$v.numero_inicial_prioridade.$touch()"
+                      dense
+                      label="Número Inicial"
+                      name="numero_inicial"
+                      outlined
+                      placeholder="Insira o número inicial do dia"
+                      required
+                      v-model="numero_inicial_prioridade"
+                    >
+                    </v-text-field>
+                  </v-col>
+
+                  <!--data_prioridade-->
+                  <v-col>
+                    <v-menu
+                      :close-on-content-click="false"
+                      :nudge-right="0"
+                      min-width="auto"
+                      offset-y
+                      transition="scale-transition"
+                      v-model="menu_data_prioridade"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-text-field
+                          label="Data de referência de atendimento"
+                          prepend-icon="mdi-calendar"
+                          readonly
+                          v-bind="attrs"
+                          v-model="computedDateFormattedPrioridade"
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker
+                        @input="menu_data_prioridade = false"
+                        v-model="data_ref_prioridade"
+                      ></v-date-picker>
+                    </v-menu>
+                  </v-col>
+
+                </v-row>
+                <!--Salvar -->
+                <v-btn
+                  class="mb-2"
+                  color="primary"
+                  dark
+                  type="submit"
+                >
+                  <v-icon class="mr-5">
+                    mdi-check
+                  </v-icon>
+                  Salvar
+                </v-btn>
+                <!--cancelar-->
+                <v-btn
+                  @click='closeAreaForm("prio")'
+                  class="mb-2"
+                  color="error"
+                  dark
+                >
+                  <v-icon class="mr-5">
+                    mdi-cancel
+                  </v-icon>
+                  Cancelar
+                </v-btn>
+              </v-form>
 
             </v-card-text>
 
@@ -274,15 +293,22 @@
 
       <!--DataTable-->
       <v-card>
-        tipo de tabela - {{tabelaTipo}}<v-spacer></v-spacer>
+        tipo de tabela - {{tabelaTipo}}
+        <v-spacer></v-spacer>
         dados de tabela - {{ tabelaDadosTipo }}
         <v-data-table
           :headers="headers"
           :items=tabelaDadosTipo
           :search="search"
           class="elevation-1"
-          sort-by="numero_inicial"
+          sort-by="id"
+          sort-desc
         >
+
+          <template v-slot:item.data_ref="{ item }">
+            <span>{{  item.data_ref.split('-')[2] + '/' + item.data_ref.split('-')[1] + '/' + item.data_ref.split('-')[0] }}</span>
+          </template>
+
           <template v-slot:top>
             <v-toolbar
               flat
@@ -322,6 +348,7 @@
                 single-line
                 v-model="search"
               ></v-text-field>
+
             </v-toolbar>
 
           </template>
@@ -339,11 +366,8 @@ export default {
   mixins: [validationMixin],
   directives: {},
   validations: {
-    numero_inicial: {required}
-    // nome_ref: {required},
-    // localizacao: {required},
-    // om: {required}
-    // cor: {required}
+    numero_inicial_normal: {required},
+    numero_inicial_prioridade: {required}
   },
 
   props: {
@@ -353,14 +377,24 @@ export default {
   },
 
   data: () => ({
+    // dados do form de ajuste
     data_ref_normal: new Date().toISOString().substr(0, 10),
     data_ref_prioridade: new Date().toISOString().substr(0, 10),
+    numero_inicial_prioridade: '',
+    numero_inicial_normal: '',
     menu_data_normal: false,
     menu_data_prioridade: false,
     // desbilita os botoes
     // Card e form Normal
     visualizaCardNormal: true,
     visualizaFormNormal: false,
+    // dados base card normal
+    num_ini_normal: '',
+    data_ini_normal: '',
+    resp_normal: '',
+    num_ini_prioridade: '',
+    data_ini_prioridade: '',
+    resp_prioridade: '',
     // Card e Form Prioridade
     visualizaCardPrioridade: true,
     visualizaFormPrioridade: false,
@@ -378,7 +412,7 @@ export default {
         value: 'numero_inicial'
       },
       {
-        text: 'Data Considerada',
+        text: 'Data / hora Considerada',
         value: 'data_ref'
       },
       {
@@ -386,20 +420,21 @@ export default {
         value: 'responsavel',
         align: 'center'
       }
-    ],
-
-    // default itens
-    om: '',
-    data_ref: '',
-    numero_inicial: '',
-    idForm: ''
+    ]
   }),
 
   computed: {
-    numeroInicialErrors () {
+    numeroInicialNormalErrors () {
       const errors = []
-      if (!this.$v.numero_inicial.$dirty) return errors
-      !this.$v.numero_inicial.required && errors.push('O Campo Número Inicial" não pode ficar em branco! ')
+      if (!this.$v.numero_inicial_normal.$dirty) return errors
+      !this.$v.numero_inicial_normal.required && errors.push('O Campo "Número Inicial" não pode ficar em branco! ')
+      return errors
+    },
+
+    numeroInicialPrioridadeErrors () {
+      const errors = []
+      if (!this.$v.numero_inicial_prioridade.$dirty) return errors
+      !this.$v.numero_inicial_prioridade.required && errors.push('O Campo "Número Inicial" não pode ficar em branco! ')
       return errors
     },
 
@@ -410,9 +445,15 @@ export default {
     computedDateFormattedPrioridade () {
       return this.formatDate(this.data_ref_prioridade)
     }
+
   },
 
   watch: {},
+
+  mounted () {
+    this.retornaNormal()
+    this.retornaPrioridade()
+  },
 
   methods: {
     formatDate (date) {
@@ -456,10 +497,84 @@ export default {
       }
     },
 
-    save () {
-      if (!this.$v.$invalid) {
-        console.log('save')
+    saveNormal () {
+      this.$v.numero_inicial_normal.$touch()
+      if (this.$v.numero_inicial_normal.$anyError) {
+        console.log('tem erro')
+      } else {
+        let objetoParaEnvio = {}
+        objetoParaEnvio['numero_inicial'] = this.numero_inicial_normal
+        objetoParaEnvio['data_ref'] = this.data_ref_normal
+        this.$http.post('parametronormal', objetoParaEnvio)
+          .then(response => {
+            this.retornaNormal()
+            this.parametrosnormal.push(response.data)
+            this.$toastr.s(
+              'Parâmetro de cahamada normal criado com sucesso', 'Sucesso!'
+            )
+            this.closeAreaForm('norm')
+          }, err => {
+            console.log(err)
+            this.$toastr.e(
+              'Não foi possível criar o parâmetro de chamada normal', 'Erro!'
+            )
+          })
       }
+    },
+
+    savePrioridade () {
+      this.$v.numero_inicial_prioridade.$touch()
+      if (this.$v.numero_inicial_prioridade.$anyError) {
+        console.log('tem erro')
+      } else {
+        let objetoParaEnvio = {}
+        objetoParaEnvio['numero_inicial'] = this.numero_inicial_prioridade
+        objetoParaEnvio['data_ref'] = this.data_ref_prioridade
+        this.$http.post('parametroprioridade', objetoParaEnvio)
+          .then(response => {
+            this.retornaPrioridade()
+            this.parametrosprioridade.push(response.data)
+            this.$toastr.s(
+              'Parâmetro de cahamada prioritária criado com sucesso', 'Sucesso!'
+            )
+            this.closeAreaForm('prio')
+          }, err => {
+            console.log(err)
+            this.$toastr.e(
+              'Não foi possível criar o parâmetro de chamada prioritária', 'Erro!'
+            )
+          })
+      }
+    },
+
+    retornaNormal () {
+      let self = this
+      this.$http.get('parametronormal/last')
+        .then(response => {
+          self.num_ini_normal = response.data.numero_inicial
+          self.data_ini_normal = response.data.data_ref.split('-')[2] + '/' + response.data.data_ref.split('-')[1] + '/' + response.data.data_ref.split('-')[0]
+          self.resp_normal = response.data.responsavel
+        }, err => {
+          console.log(err)
+          this.$toastr.e(
+            'Não foi possível obter dados de chamada normal', 'Erro!'
+          )
+        })
+    },
+
+    retornaPrioridade () {
+      let self = this
+      this.$http.get('parametroprioridade/last')
+        .then(response => {
+          self.num_ini_prioridade = response.data.numero_inicial
+          self.data_ini_prioridade = response.data.data_ref.split('-')[2] + '/' + response.data.data_ref.split('-')[1] + '/' + response.data.data_ref.split('-')[0]
+          self.resp_prioridade = response.data.responsavel
+        }, err => {
+          console.log(err)
+          this.$toastr.e(
+            'Não foi possível obter dados de chamada preferencial', 'Erro!'
+          )
+        })
     }
 
   }

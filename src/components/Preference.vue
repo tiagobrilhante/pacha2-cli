@@ -371,7 +371,6 @@ export default {
     parametrosnormal: Array,
     parametrosprioridade: Array
   },
-
   data: () => ({
     // dados do form de ajuste
     data_ref_normal: new Date().toISOString().substr(0, 10),

@@ -293,9 +293,6 @@
 
       <!--DataTable-->
       <v-card>
-        tipo de tabela - {{tabelaTipo}}
-        <v-spacer></v-spacer>
-        dados de tabela - {{ tabelaDadosTipo }}
         <v-data-table
           :headers="headers"
           :items=tabelaDadosTipo
@@ -453,6 +450,7 @@ export default {
   mounted () {
     this.retornaNormal()
     this.retornaPrioridade()
+    // this.getTableData('Normal')
   },
 
   methods: {
@@ -488,6 +486,19 @@ export default {
     },
 
     getTableData (tipo) {
+      let self = this
+      this.$http.get('parametroprioridade/last')
+        .then(response => {
+          self.num_ini_prioridade = response.data.numero_inicial
+          self.data_ini_prioridade = response.data.data_ref.split('-')[2] + '/' + response.data.data_ref.split('-')[1] + '/' + response.data.data_ref.split('-')[0]
+          self.resp_prioridade = response.data.responsavel
+        }, err => {
+          console.log(err)
+          this.$toastr.e(
+            'Não foi possível obter dados de chamada preferencial', 'Erro!'
+          )
+        })
+
       if (tipo === 'Normal') {
         this.tabelaTipo = 'Normal'
         this.tabelaDadosTipo = this.parametrosnormal

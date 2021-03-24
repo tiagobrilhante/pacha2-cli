@@ -1,7 +1,6 @@
 <template>
 
   <div class="ml-5">
-
     <!--Home-->
     <v-tooltip bottom color="primary">
       <template v-slot:activator="{ on, attrs }">
@@ -27,7 +26,7 @@
       rounded="b-xl"
       v-if="usuarioResetado"
     >
-      <template v-slot:activator="{ on, attrs }">
+      <template v-if="checaPermissaoAdmin" v-slot:activator="{ on, attrs }">
         <v-btn
           color="white"
           plain
@@ -39,6 +38,13 @@
       </template>
       <!--list-->
       <v-list>
+        <!--Gerenciar Oms-->
+        <v-list-item to="/oms">
+          <i class="fab fa-fort-awesome mr-5"></i>
+          <v-list-item-title>
+            Gerenciar Oms
+          </v-list-item-title>
+        </v-list-item>
         <!--Gerenciar Usuários-->
         <v-list-item to="/usuarios">
           <i class="fa fa-users mr-5"></i>
@@ -62,6 +68,15 @@
             Gerenciar Guichês
           </v-list-item-title>
         </v-list-item>
+        <!--gerenciar tipos de atendimento-->
+        <v-list-item to="/tiposatendimento">
+          <v-icon class="mr-5" color="black">
+            mdi-format-list-text
+          </v-icon>
+          <v-list-item-title>
+            Gerenciar tipos de atendimento
+          </v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-menu>
 
@@ -72,12 +87,13 @@
       rounded="b-xl"
       v-if="usuarioResetado"
     >
-      <template v-slot:activator="{ on, attrs }">
+      <template v-slot:activator="{ on, attrs }" v-if="checaPermissaoChamador">
         <v-btn
           color="white"
           plain
           v-bind="attrs"
           v-on="on"
+
         >
           <v-icon class="mr-5">
             mdi-speaker-wireless
@@ -111,6 +127,19 @@ export default {
 
     ...mapGetters(['usuarioResetado', 'usuarioLogado'])
 
+  },
+  data: () => ({
+    checaPermissaoAdmin: true,
+    checaPermissaoChamador: true
+  }),
+  mounted () {
+    if (this.usuarioLogado.tipo === 'Chamador') {
+      this.checaPermissaoAdmin = false
+      this.checaPermissaoChamador = true
+    } else {
+      this.checaPermissaoAdmin = true
+      this.checaPermissaoChamador = false
+    }
   }
 }
 </script>

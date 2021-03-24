@@ -1,6 +1,7 @@
 <template>
   <v-main>
     <v-container class="pt-5">
+
       <!--Banner-->
       <v-banner
         class="p-5"
@@ -10,15 +11,15 @@
           size="36"
           slot="icon"
         >
-          mdi-desktop-classic
+          mdi-format-list-text
         </v-icon>
-        <h2>Gerenciamento de Guichês de Chamada </h2>
+        <h2>Gerenciamento de Tipos de atendimento </h2>
       </v-banner>
 
       <!--DataTable-->
       <v-data-table
         :headers="headers"
-        :items="guiches"
+        :items="tipos"
         :search="search"
         class="elevation-1"
         sort-by="ip"
@@ -27,7 +28,7 @@
           <v-toolbar
             flat
           >
-            <v-toolbar-title>Tabela de Guiches Cadastrados</v-toolbar-title>
+            <v-toolbar-title>Tabela de Tipos Cadastrados</v-toolbar-title>
             <v-divider
               class="mx-4"
               inset
@@ -51,7 +52,7 @@
                   <v-icon class="mr-5">
                     mdi-message-plus-outline
                   </v-icon>
-                  Novo Guiche de Atendimento
+                  Novo Tipo de Atendimento
                 </v-btn>
               </template>
 
@@ -59,15 +60,13 @@
               <form>
                 <v-card>
                   <v-card-title>
-                    <span class="headline">
-                      <v-icon class="mr-5" color="black"> mdi-desktop-classic</v-icon>
-                      {{ formTitle }}</span>
+                    <span class="headline"><i class="fa fa-desktop"></i> {{ formTitle }}</span>
                   </v-card-title>
 
                   <v-card-text>
                     <v-container>
                       <v-row>
-                        <!--IP - Localização, OM e nome ref-->
+                        <!--tipo e OM-->
                         <v-col
                           cols="12"
                           md="6"
@@ -77,68 +76,38 @@
                           <v-row>
                             <v-col>
                               <v-text-field
-                                :error-messages="ipErrors"
-                                @blur="$v.ip.$touch()"
-                                @input="$v.ip.$touch()"
+                                :error-messages="tipoErrors"
+                                @blur="$v.tipo.$touch()"
+                                @input="$v.tipo.$touch()"
                                 dense
-                                label="Ip"
-                                name="ip"
+                                label="Tipo de Atendimento"
+                                name="tipo"
                                 outlined
-                                placeholder="Insira o IP do painel"
+                                placeholder="Insira o tipo de atendimento"
+                                hint="Ex: 'Prova de vida'"
                                 required
-                                v-model="ip"
+                                v-model="tipo"
                               >
                               </v-text-field>
                             </v-col>
                           </v-row>
-                          <!--nome de referência-->
-                          <v-row>
-                            <v-col>
-                              <v-text-field
-                                :error-messages="nomeRefErrors"
-                                dense
-                                hint="Por exemplo: 1 A"
-                                label="Nome de Referência do guichê"
-                                name="nome_ref"
-                                outlined
-                                placeholder="Insira o nome de referência do guichê"
-                                required
-                                v-model="nome_ref"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
-                          <!--Localização-->
-                          <v-row>
-                            <v-col>
-                              <v-text-field
-                                dense
-                                hint="Por exemplo: Recepção"
-                                label="Localização do guichê"
-                                name="localizacao"
-                                outlined
-                                placeholder="Insira o local do guichê"
-                                required
-                                v-model="localizacao"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
-                          <!--Painel Vinculado-->
+                          <!--OM-->
                           <v-row>
                             <v-col>
                               <v-select
-                                :error-messages="panelErrors"
-                                :items="panels"
-                                @blur="$v.panel.$touch()"
-                                @input="$v.panel.$touch()"
+                                :error-messages="omErrors"
+                                :items="oms"
+                                @blur="$v.om.$touch()"
+                                @input="$v.om.$touch()"
                                 dense
-                                :item-text="item => item.localizacao + ' - ' + item.om.sigla  +' ( ' + item.ip + ' ) '"
+                                item-text="sigla"
                                 item-value="id"
-                                label="Painel Vinculado"
-                                name="panel"
+                                label="Om"
+                                name="om"
                                 outlined
-                                placeholder="Selecione o Painel vinculado ao Guichê"
+                                placeholder="Selecione a Om vinculada ao Tipo"
                                 required
-                                v-model="panel"
+                                v-model="om"
                               ></v-select>
                             </v-col>
                           </v-row>
@@ -158,7 +127,7 @@
                               <v-row>
 
                                 <v-col>
-                                  <p><b>Cor de referencia do guichê</b></p>
+                                  <p><b>Cor de referencia do Tipo de atendiemento</b></p>
                                   <v-color-picker
                                     canvas-height="100"
                                     hide-inputs
@@ -220,7 +189,7 @@
               <v-card>
                 <v-card-title class="justify-center" primary-title><i class="fa fa-exclamation-triangle mr-4"></i> Você
                   tem
-                  certeza que quer deletar o Guichê? <i
+                  certeza que quer excluir este tipo de atendimento? <i
                     class="fa fa-exclamation-triangle ml-4"></i></v-card-title>
                 <v-card-text>
                   <div class="text-center">Essa ação é irreverssível. Tenha certeza do que está fazendo.</div>
@@ -229,7 +198,7 @@
                   <v-spacer></v-spacer>
                   <v-btn @click="closeDelete" color="grey lighten-1">Cancelar</v-btn>
                   <span class="pl-5 pr-5"></span>
-                  <v-btn @click="deleteGuicheConfirm" color="red lighten-1">Excluir</v-btn>
+                  <v-btn @click="deleteTipoConfirm" color="red lighten-1">Excluir</v-btn>
                   <v-spacer></v-spacer>
                 </v-card-actions>
               </v-card>
@@ -245,7 +214,7 @@
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-icon
-                @click="editGuiche(item)"
+                @click="editTipo(item)"
                 class="mr-2"
                 small
                 v-bind="attrs"
@@ -254,13 +223,13 @@
                 mdi-pencil
               </v-icon>
             </template>
-            <span>Editar Guichê</span>
+            <span>Editar Tipo</span>
           </v-tooltip>
           <!--Excluir-->
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-icon
-                @click="deleteGuiche(item)"
+                @click="deleteTipo(item)"
                 class="mr-2"
                 small
                 v-bind="attrs"
@@ -269,7 +238,7 @@
                 mdi-delete
               </v-icon>
             </template>
-            <span>Excluir Guichê</span>
+            <span>Excluir Tipo</span>
           </v-tooltip>
         </template>
 
@@ -293,9 +262,9 @@ export default {
   mixins: [validationMixin],
   directives: {},
   validations: {
-    ip: {required},
-    panel: {required},
-    nome_ref: {required}
+    tipo: {required},
+    om: {required}
+    // cor: {required}
   },
 
   data: () => ({
@@ -305,31 +274,13 @@ export default {
     dialogDelete: false,
     headers: [
       {
-        text: 'Ip do Guichê',
+        text: 'Tipo',
         align: 'start',
-        value: 'ip'
-      },
-      {
-        text: 'Localizacao',
-        value: 'localizacao'
-      },
-      {
-        text: 'Nome Ref',
-        value: 'nome_ref'
-      },
-      {
-        text: 'Painel Vinculado',
-        value: 'panel.localizacao',
-        align: 'center'
-      },
-      {
-        text: 'IP Painel',
-        value: 'panel.ip',
-        align: 'center'
+        value: 'tipo'
       },
       {
         text: 'Om',
-        value: 'panel.om.sigla',
+        value: 'om.sigla',
         align: 'center'
       },
       {
@@ -345,53 +296,35 @@ export default {
       }
     ],
     editedIndex: -1,
-    ip: '',
-    panel: '',
-    cor: '',
+    tipo: '',
     om: '',
-    localizacao: '',
-    nome_ref: '',
-    defaultGuiche: {
-      ip: '',
-      panel: '',
-      cor: '',
-      localizacao: '',
-      nome_ref: ''
+    cor: '',
+    defaultTipo: {
+      tipo: '',
+      om: '',
+      cor: ''
     },
-    editedGuiche: {
-      ip: '',
-      cor: '',
-      localizacao: '',
-      nome_ref: ''
+    editedTipo: {
+      tipo: '',
+      om: '',
+      cor: ''
     }
   }),
 
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'Novo Guichê' : 'Editar Guichê'
+      return this.editedIndex === -1 ? 'Novo Tipo de Atendimento' : 'Editar Tipo de Atendimento'
     },
-    ipErrors () {
+    tipoErrors () {
       const errors = []
-      if (!this.$v.ip.$dirty) return errors
-      !this.$v.ip.required && errors.push('O Campo "IP" não pode ficar em branco! ')
-      return errors
-    },
-    panelErrors () {
-      const errors = []
-      if (!this.$v.panel.$dirty) return errors
-      !this.$v.panel.required && errors.push('O Campo "Painel Vinculado" não pode ficar em branco! ')
+      if (!this.$v.tipo.$dirty) return errors
+      !this.$v.tipo.required && errors.push('O Campo "Tipo de Atendimento" não pode ficar em branco! ')
       return errors
     },
     omErrors () {
       const errors = []
       if (!this.$v.om.$dirty) return errors
       !this.$v.om.required && errors.push('O Campo "Om" não pode ficar em branco! ')
-      return errors
-    },
-    nomeRefErrors () {
-      const errors = []
-      if (!this.$v.nome_ref.$dirty) return errors
-      !this.$v.nome_ref.required && errors.push('O Campo "Nome de Referência" não pode ficar em branco! ')
       return errors
     },
     showColor () {
@@ -420,21 +353,18 @@ export default {
   },
 
   props: {
-    guiches: Array,
-    panels: Array,
+    tipos: Array,
     oms: Array
   },
 
   methods: {
-    editGuiche (item) {
-      this.editedIndex = this.guiches.indexOf(item)
-      this.editedGuiche = Object.assign({}, item)
-      this.id = this.editedGuiche.id
-      this.ip = this.editedGuiche.ip
-      this.panel = this.editedGuiche.panel.id
-      this.localizacao = this.editedGuiche.localizacao
-      this.nome_ref = this.editedGuiche.nome_ref
-      this.cor = this.editedGuiche.cor
+    editTipo (item) {
+      this.editedIndex = this.tipos.indexOf(item)
+      this.editedTipo = Object.assign({}, item)
+      this.id = this.editedTipo.id
+      this.tipo = this.editedTipo.tipo
+      this.cor = this.editedTipo.cor
+      this.om = this.editedTipo.om.id
       this.$v.$touch()
       this.dialog = true
     },
@@ -443,27 +373,27 @@ export default {
       return cor
     },
 
-    deleteGuiche (item) {
-      this.editedIndex = this.guiches.indexOf(item)
-      this.editedGuiche = Object.assign({}, item)
+    deleteTipo (item) {
+      this.editedIndex = this.tipos.indexOf(item)
+      this.editedTipo = Object.assign({}, item)
       this.dialogDelete = true
     },
 
-    deleteGuicheConfirm () {
-      this.$http.delete('guiches/' + this.editedGuiche.id)
+    deleteTipoConfirm () {
+      this.$http.delete('tipoatendimento/' + this.editedTipo.id)
       // eslint-disable-next-line no-return-assign
         .then(() => {
-          this.guiches.splice(this.editedIndex, 1)
+          this.tipos.splice(this.editedIndex, 1)
           this.resetFields()
           this.closeDelete()
           this.$toastr.s(
-            'Guichê removido com sucesso', 'Sucesso!'
+            'Tipo de atendimento removido com sucesso', 'Sucesso!'
           )
           this.resetFields()
         }, err => {
           console.log(err)
           this.$toastr.e(
-            'Não foi possível remover o Guichê', 'Erro!'
+            'Não foi possível remover o Tipo de atendimento', 'Erro!'
           )
         })
     },
@@ -471,7 +401,7 @@ export default {
     closeDelete () {
       this.dialogDelete = false
       this.$nextTick(() => {
-        this.editedGuiche = Object.assign({}, this.defaultGuiche)
+        this.editedTipo = Object.assign({}, this.defaultTipo)
         this.editedIndex = -1
         this.resetFields()
       })
@@ -479,17 +409,15 @@ export default {
 
     resetFields () {
       this.id = ''
-      this.ip = ''
-      this.localizacao = ''
-      this.panel = ''
-      this.nome_ref = ''
+      this.tipo = ''
       this.cor = ''
+      this.om = ''
     },
 
     close () {
       this.dialog = false
       this.$nextTick(() => {
-        this.editedGuiche = Object.assign({}, this.defaultGuiche)
+        this.editedTipo = Object.assign({}, this.defaultTipo)
         this.editedIndex = -1
         this.resetFields()
       })
@@ -501,66 +429,59 @@ export default {
           let ajustaObjeto = {}
           let objetoParaEnvio = {}
 
-          let novoPanel = []
-          if (typeof this.panel === 'object') {
-            novoPanel = this.panel
+          let novaOm = []
+          if (typeof this.om === 'object') {
+            novaOm = this.om
           } else {
-            for (let i = 0; i < this.panels.length; i++) {
-              if (this.panels[i].id === this.panel) {
-                novoPanel = this.panels[i]
+            for (let i = 0; i < this.oms.length; i++) {
+              if (this.oms[i].id === this.om) {
+                novaOm = this.oms[i]
               }
             }
           }
-
           ajustaObjeto['id'] = this.id
-          ajustaObjeto['ip'] = this.ip
-          ajustaObjeto['localizacao'] = this.localizacao
-          ajustaObjeto['nome_ref'] = this.nome_ref
+          ajustaObjeto['tipo'] = this.tipo
           ajustaObjeto['cor'] = this.cor
-          ajustaObjeto['panel'] = novoPanel
+          ajustaObjeto['om'] = novaOm
           ajustaObjeto['edited_index'] = this.editedIndex
 
           objetoParaEnvio['id'] = this.id
-          objetoParaEnvio['ip'] = this.ip
-          objetoParaEnvio['localizacao'] = this.localizacao
-          objetoParaEnvio['nome_ref'] = this.nome_ref
+          objetoParaEnvio['tipo'] = this.tipo
           objetoParaEnvio['cor'] = this.cor
-          objetoParaEnvio['panel_id'] = novoPanel.id
+          objetoParaEnvio['om_id'] = novaOm.id
 
-          this.$http.put('guiches/' + objetoParaEnvio.id, objetoParaEnvio)
+          this.$http.put('tipoatendimento/' + objetoParaEnvio.id, objetoParaEnvio)
           // eslint-disable-next-line no-return-assign
             .then(() => {
-              Object.assign(this.guiches[ajustaObjeto.edited_index], ajustaObjeto)
+              Object.assign(this.tipos[ajustaObjeto.edited_index], ajustaObjeto)
               this.$toastr.s(
-                'Guichê alterado com sucesso', 'Sucesso!'
+                'Tipo de atendimento alterado com sucesso', 'Sucesso!'
               )
               this.resetFields()
               this.close()
             }, err => {
               console.log(err)
               this.$toastr.e(
-                'Não foi possível alterar o Guichê', 'Erro!'
+                'Não foi possível alterar o Tipo de atendimento', 'Erro!'
               )
             })
         } else {
           let objetoParaEnvio = {}
-          objetoParaEnvio['ip'] = this.ip
-          objetoParaEnvio['localizacao'] = this.localizacao
-          objetoParaEnvio['nome_ref'] = this.nome_ref
+          objetoParaEnvio['tipo'] = this.tipo
           objetoParaEnvio['cor'] = this.cor
-          objetoParaEnvio['panel_id'] = this.panel
-          this.$http.post('guiches', objetoParaEnvio)
+          objetoParaEnvio['om_id'] = this.om
+          this.$http.post('tipoatendimento', objetoParaEnvio)
             .then(response => {
-              this.guiches.push(response.data)
+              this.tipos.push(response.data)
               this.$toastr.s(
-                'Guichê criado com sucesso', 'Sucesso!'
+                'Tipo de atendimento criado com sucesso', 'Sucesso!'
               )
               this.resetFields()
               this.close()
             }, err => {
               console.log(err)
               this.$toastr.e(
-                'Não foi possível criar o Guichê', 'Erro!'
+                'Não foi possível criar o Tipo de atendimento', 'Erro!'
               )
             })
         }

@@ -22,18 +22,42 @@
           </v-card>
         </v-col>
       </v-row>
+      <v-row class="mt-5">
+        <v-col
+          cols="6"
+          offset="3"
+        >
+          <v-card
+            elevation="10"
+            outlined
+            rounded="lg"
+          >
+            <v-row>
+              <v-col cols="10" offset="1">
+                <div class="text-center">
+                  <h1 @click.prevent="checarPermissao">Estatísticas para Administradores</h1>
+                </div>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
+      </v-row>
 
     </v-container>
   </v-main>
 </template>
 
 <script>import {logoutMixin} from '@/mixins'
+import {mapGetters} from 'vuex'
 
 export default {
   name: 'home',
   mixins: [logoutMixin],
-  mounted () {
-  },
-  methods: {}
+  methods: {},
+  computed: {
+
+    ...mapGetters(['usuarioLogado'])
+
+  }
 }
 </script>

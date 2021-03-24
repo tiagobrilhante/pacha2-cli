@@ -117,7 +117,11 @@ export default {
             if (response.user.reset) {
               this.$router.push({name: 'reset'})
             } else {
-              this.$router.push({name: 'home'})
+              if (response.user.tipo === 'Chamador') {
+                this.$router.push({name: 'homeChamador'})
+              } else {
+                this.$router.push({name: 'home'})
+              }
             }
           })
           .catch(erro => {

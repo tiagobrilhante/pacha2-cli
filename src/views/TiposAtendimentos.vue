@@ -1,25 +1,25 @@
 <template>
-  <Painel :oms="oms" :paineis="paineis"/>
+  <TipoAtendimento :oms="oms" :tipos="tipos"/>
 </template>
 
-<script>import Painel from '../components/Painel.vue'
+<script>import TipoAtendimento from '../components/TipoAtendimento'
 import {mapGetters} from 'vuex'
 
 export default {
   components: {
-    Painel
+    TipoAtendimento
   },
   data () {
     return {
-      paineis: [],
+      tipos: [],
       oms: []
     }
   },
   mounted () {
     let self = this
-    this.$http.get('panels/load')
+    this.$http.get('tipoatendimento/alltipos')
       .then(response => {
-        self.paineis = response.data
+        self.tipos = response.data.data
       })
       .catch(erro => console.log(erro))
 

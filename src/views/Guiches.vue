@@ -1,5 +1,5 @@
 <template>
-  <Guiche :oms="oms" :guiches="guiches"/>
+  <Guiche :guiches="guiches" :oms="oms" :panels="panels" v-if="loading"/>
 </template>
 
 <script>import Guiche from '../components/Guiche.vue'
@@ -12,22 +12,40 @@ export default {
   data () {
     return {
       guiches: [],
-      oms: []
+      panels: [],
+      oms: [],
+      loading: false
     }
   },
-  mounted () {
-    let self = this
-    this.$http.get('guiches')
-      .then(response => {
-        self.guiches = response.data.data
-      })
-      .catch(erro => console.log(erro))
+  async mounted () {
+    await this.getInfo()
+    this.loading = true
+  },
+  methods: {
+    async getInfo () {
+      try {
+        let self = this
+        await this.$http.get('guiches/load')
+          .then(response => {
+            self.guiches = response.data
+          })
+          .catch(erro => console.log(erro))
 
-    this.$http.get('om/disponivel')
-      .then(response => {
-        self.oms = response.data
-      })
-      .catch(erro => console.log(erro))
+        await this.$http.get('panels/showpanel')
+          .then(response => {
+            self.panels = response.data
+          })
+          .catch(erro => console.log(erro))
+
+        await this.$http.get('om/disponivel')
+          .then(response => {
+            self.oms = response.data
+          })
+          .catch(erro => console.log(erro))
+      } catch (e) {
+        console.log(e)
+      }
+    }
   },
   computed: {
 

@@ -398,7 +398,7 @@ export default {
     desativadoPrioridade: false,
     // tabela tipo e retorno + ajustes
     tabelaTipo: 'Normal',
-    tabelaDadosTipo: this.parametrosnormal,
+    tabelaDadosTipo: [],
     search: '',
     headers: [
       {
@@ -413,6 +413,11 @@ export default {
       {
         text: 'Responsável',
         value: 'responsavel',
+        align: 'center'
+      },
+      {
+        text: 'Validação',
+        value: 'validacao',
         align: 'center'
       }
     ]
@@ -448,7 +453,7 @@ export default {
   mounted () {
     this.retornaNormal()
     this.retornaPrioridade()
-    // this.getTableData('Normal')
+    this.getTableData('Normal')
   },
 
   methods: {
@@ -484,19 +489,6 @@ export default {
     },
 
     getTableData (tipo) {
-      let self = this
-      this.$http.get('parametroprioridade/last')
-        .then(response => {
-          self.num_ini_prioridade = response.data.numero_inicial
-          self.data_ini_prioridade = response.data.data_ref.split('-')[2] + '/' + response.data.data_ref.split('-')[1] + '/' + response.data.data_ref.split('-')[0]
-          self.resp_prioridade = response.data.responsavel
-        }, err => {
-          console.log(err)
-          this.$toastr.e(
-            'Não foi possível obter dados de chamada preferencial', 'Erro!'
-          )
-        })
-
       if (tipo === 'Normal') {
         this.tabelaTipo = 'Normal'
         this.tabelaDadosTipo = this.parametrosnormal
@@ -509,7 +501,7 @@ export default {
     saveNormal () {
       this.$v.numero_inicial_normal.$touch()
       if (this.$v.numero_inicial_normal.$anyError) {
-        console.log('tem erro')
+        console.log('Existem erros no processamento do formulário')
       } else {
         let objetoParaEnvio = {}
         objetoParaEnvio['numero_inicial'] = this.numero_inicial_normal
@@ -534,7 +526,7 @@ export default {
     savePrioridade () {
       this.$v.numero_inicial_prioridade.$touch()
       if (this.$v.numero_inicial_prioridade.$anyError) {
-        console.log('tem erro')
+        console.log('Existem erros no processamento do formulário')
       } else {
         let objetoParaEnvio = {}
         objetoParaEnvio['numero_inicial'] = this.numero_inicial_prioridade

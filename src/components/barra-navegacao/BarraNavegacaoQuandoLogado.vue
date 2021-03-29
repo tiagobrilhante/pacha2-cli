@@ -77,6 +77,15 @@
             Gerenciar tipos de atendimento
           </v-list-item-title>
         </v-list-item>
+        <!--gerenciar publico alvo-->
+        <v-list-item to="/publicoalvo">
+          <v-icon class="mr-5" color="black">
+            mdi-account-star-outline
+          </v-icon>
+          <v-list-item-title>
+            Gerenciar Público Alvo
+          </v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-menu>
 

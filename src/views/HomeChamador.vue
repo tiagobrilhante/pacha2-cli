@@ -221,9 +221,10 @@
                           </v-row>
                         </v-container>
 
-                        <!--tipo atendimento-->
+                        <!--tipo atendimento e publico alvo-->
                         <v-container>
-                          <v-row>
+                          <v-row class="pb-0 mb-0">
+                            <!--tipo de atendimento-->
                             <v-col>
                               <v-select
                                 :error-messages="tipoErrors"
@@ -239,6 +240,25 @@
                                 placeholder="Selecione o tipo de atendimento"
                                 required
                                 v-model="tipo"
+                              ></v-select>
+                            </v-col>
+
+                            <!--publico alvo-->
+                            <v-col>
+                              <v-select
+                                :error-messages="publicoErrors"
+                                :items="listaPublicos"
+                                @blur="$v.publico.$touch()"
+                                @input="$v.publico.$touch()"
+                                dense
+                                item-text="tipo"
+                                item-value="id"
+                                label="Público Alvo"
+                                name="publico"
+                                outlined
+                                placeholder="Selecione o alvo do atendimento"
+                                required
+                                v-model="publico"
                               ></v-select>
                             </v-col>
                           </v-row>
@@ -318,18 +338,37 @@
               sort-desc
             >
 
+              <!--Criado em-->
               <template v-slot:item.created_at="{ item }">
                 <span>{{ new Date(item.created_at).toLocaleString() }}</span>
               </template>
 
+              <!--updated at-->
+              <template v-slot:item.updated_at="{ item }">
+                <span>{{ new Date(item.updated_at).toLocaleString() }}</span>
+              </template>
+
+              <!--tempo-->
+              <template v-slot:item.tempo="{ item }">
+                <span>{{ difTempoChamado(item.updated_at,item.created_at ) }}</span>
+              </template>
+
+              <!--Tipo de atendimento-->
               <template v-slot:item.tipo_atendimento="{ item }">
                 <span>{{ formatWhiteSpaces(item.tipo_atendimento) }}</span>
               </template>
 
+              <!--Publico Alvo-->
+              <template v-slot:item.publico_alvo="{ item }">
+                <span>{{ formatWhiteSpaces(item.publico_alvo) }}</span>
+              </template>
+
+              <!--Nome de referencia-->
               <template v-slot:item.nome_ref="{ item }">
                 <span>{{ formatWhiteSpaces(item.nome_ref) }}</span>
               </template>
 
+              <!--NUmero de referencia-->
               <template v-slot:item.numero_ref="{ item }">
                 <span>{{ formatWhiteSpaces(item.numero_ref) }}</span>
               </template>
@@ -373,8 +412,8 @@
                     inset
                     vertical></v-divider>
                   <v-btn
-                    @click="showGeralTable(statusTabelaGeral)"
                     :color=colorBtnTableGeral
+                    @click="showGeralTable(statusTabelaGeral)"
                   >
                     {{ textChamaGeral }} Chamadas do Painel
                   </v-btn>
@@ -415,18 +454,37 @@
               sort-desc
             >
 
+              <!--created at-->
               <template v-slot:item.created_at="{ item }">
                 <span>{{ new Date(item.created_at).toLocaleString() }}</span>
               </template>
 
+              <!--updated at-->
+              <template v-slot:item.updated_at="{ item }">
+                <span>{{ new Date(item.updated_at).toLocaleString() }}</span>
+              </template>
+
+              <!--tempo-->
+              <template v-slot:item.tempo="{ item }">
+                <span>{{ difTempoChamado(item.updated_at,item.created_at ) }}</span>
+              </template>
+
+              <!--Tipo de atendimento-->
               <template v-slot:item.tipo_atendimento="{ item }">
                 <span>{{ formatWhiteSpaces(item.tipo_atendimento) }}</span>
               </template>
 
+              <!--Publico Alvo-->
+              <template v-slot:item.publico_alvo="{ item }">
+                <span>{{ formatWhiteSpaces(item.publico_alvo) }}</span>
+              </template>
+
+              <!--Nome de referencia-->
               <template v-slot:item.nome_ref="{ item }">
                 <span>{{ formatWhiteSpaces(item.nome_ref) }}</span>
               </template>
 
+              <!--numero de referencia-->
               <template v-slot:item.numero_ref="{ item }">
                 <span>{{ formatWhiteSpaces(item.numero_ref) }}</span>
               </template>
@@ -491,10 +549,12 @@ export default {
   mixins: [validationMixin, logoutMixin],
   validations: {
     tipo: {required},
+    publico: {required},
     nome_ref: {required}
   },
   data: () => ({
     listaTipos: [],
+    listaPublicos: [],
     guiche: '',
     guicheNomeRef: '',
     guichePanelRef: '',
@@ -519,8 +579,21 @@ export default {
         value: 'created_at'
       },
       {
+        text: 'Data / hora Finalização',
+        value: 'updated_at'
+      },
+      {
+        text: 'Tempo Aproximado de atendimento',
+        value: 'tempo'
+      },
+      {
         text: 'Tipo de Atendimento',
         value: 'tipo_atendimento',
+        align: 'center'
+      },
+      {
+        text: 'Publico Alvo',
+        value: 'publico_alvo',
         align: 'center'
       },
       {
@@ -550,8 +623,21 @@ export default {
         value: 'created_at'
       },
       {
+        text: 'Data / hora Finalização',
+        value: 'updated_at'
+      },
+      {
+        text: 'Tempo Aproximado de atendimento',
+        value: 'tempo'
+      },
+      {
         text: 'Tipo de Chamado',
         value: 'tipo',
+        align: 'center'
+      },
+      {
+        text: 'Publico Alvo',
+        value: 'publico_alvo',
         align: 'center'
       },
       {
@@ -584,6 +670,7 @@ export default {
     chamadasGerais: [],
     tabelaDadosTipo: [],
     tipo: '',
+    publico: '',
     loading: false,
     meuConsole: true,
     meuAtiva: false,
@@ -624,6 +711,12 @@ export default {
       !this.$v.tipo.required && errors.push('O Campo "Tipo de Atendimento" não pode ficar em branco! ')
       return errors
     },
+    publicoErrors () {
+      const errors = []
+      if (!this.$v.publico.$dirty) return errors
+      !this.$v.publico.required && errors.push('O Campo "Público Alvo" não pode ficar em branco! ')
+      return errors
+    },
     nomeRefErrors () {
       const errors = []
       if (!this.$v.nome_ref.$dirty) return errors
@@ -649,6 +742,14 @@ export default {
         this.$http.get('tipoatendimento/alltipos')
           .then(response => {
             self.listaTipos = response.data.data
+          })
+          .catch(erro => console.log(erro))
+
+        // retorna todos os publicos alvos disponiveis
+        this.$http.get('publicoalvo/alltipos')
+          .then(response => {
+            console.log(response)
+            self.listaPublicos = response.data.data
           })
           .catch(erro => console.log(erro))
       } catch (e) {
@@ -794,6 +895,23 @@ export default {
       }
     },
 
+    // calcula a diferença em horas de um atendimeto
+    difTempoChamado (updated, created) {
+      const data1 = new Date(created)
+      const data2 = new Date(updated)
+      const tempoAtendimento = Math.round((data2 - data1) / 60000)
+
+      if (tempoAtendimento === 1) {
+        return tempoAtendimento + ' minuto'
+      } else if (tempoAtendimento > 1) {
+        return tempoAtendimento + ' minutos'
+      } else if (tempoAtendimento === 0) {
+        return 'menor que 60 segundos'
+      } else {
+        return 'tempo inválido'
+      }
+    },
+
     // abre o dialog para inserir o nome
     preChamaNominal () {
       this.dialogChamaNominal = true
@@ -820,7 +938,21 @@ export default {
               this.chamadaAtivaConsoleTipo = response.data.tipo
               this.chamadaAtivaConsoleNumero = response.data.nome_ref
               this.chamadaAtivaConsoleChamador = response.data.chamador
-              this.chamadaAtivaConsoleDateTime = response.data.created_at
+
+              let leData = new Date(response.data.created_at)
+              let options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric'
+              }
+              options.timeZone = 'America/Manaus'
+              // options.timeZoneName = 'short'
+              this.chamadaAtivaConsoleDateTime = leData.toLocaleDateString('pt-br', options)
+
               this.chamadaAtivaConsoleId = response.data.id
             })
             .catch(erro => console.log(erro))
@@ -839,7 +971,19 @@ export default {
             this.chamadaAtivaConsoleTipo = response.data.tipo
             this.chamadaAtivaConsoleNumero = response.data.numero_ref
             this.chamadaAtivaConsoleChamador = response.data.chamador
-            this.chamadaAtivaConsoleDateTime = response.data.created_at
+            let leData = new Date(response.data.created_at)
+            let options = {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              second: 'numeric'
+            }
+            options.timeZone = 'America/Manaus'
+            // options.timeZoneName = 'short'
+            this.chamadaAtivaConsoleDateTime = leData.toLocaleDateString('pt-br', options)
             this.chamadaAtivaConsoleId = response.data.id
           })
           .catch(erro => console.log(erro))
@@ -871,16 +1015,20 @@ export default {
     // finaliza uma chamada (sucesso)
     finaliza () {
       // this.$v.tipo.$invalid === true significa que tem erro
-      if (this.$v.tipo.$invalid) {
+      // this.$v.publico.$invalid === true significa que tem erro
+      if (this.$v.tipo.$invalid || this.$v.publico.$invalid) {
         this.$v.tipo.$touch()
+        this.$v.publico.$touch()
       } else {
         let objetoEnvio = {}
         objetoEnvio['id_chamada'] = this.chamadaAtivaConsoleId
         objetoEnvio['tipo_atendimento'] = this.$v.tipo.$model
+        objetoEnvio['publico_alvo'] = this.$v.publico.$model
+
+        console.log(objetoEnvio)
 
         this.$http.post('chamadas/finaliza', objetoEnvio)
           .then(response => {
-            console.log(response)
             if (response.data.tipo === 'Normal') {
               this.minhasChamadasNormais.push(response.data)
             } else if (response.data.tipo === 'Preferencial') {
@@ -889,6 +1037,7 @@ export default {
               this.minhasChamadasNominais.push(response.data)
             }
             this.tipo = ''
+            this.publico = ''
             this.meuConsole = true
             this.meuAtiva = false
             this.dialogChamaNominal = false

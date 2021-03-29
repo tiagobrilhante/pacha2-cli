@@ -11,9 +11,9 @@
           size="36"
           slot="icon"
         >
-          mdi-format-list-text
+          mdi-account-star-outline
         </v-icon>
-        <h2>Gerenciamento de Tipos de atendimento </h2>
+        <h2>Gerenciamento de Publico Alvo </h2>
       </v-banner>
 
       <!--DataTable-->
@@ -28,7 +28,7 @@
           <v-toolbar
             flat
           >
-            <v-toolbar-title>Tabela de Tipos Cadastrados</v-toolbar-title>
+            <v-toolbar-title>Tabela de Publico Alvo Cadastrados</v-toolbar-title>
             <v-divider
               class="mx-4"
               inset
@@ -52,7 +52,7 @@
                   <v-icon class="mr-5">
                     mdi-message-plus-outline
                   </v-icon>
-                  Novo Tipo de Atendimento
+                  Novo publico alvo
                 </v-btn>
               </template>
 
@@ -60,7 +60,7 @@
               <form>
                 <v-card>
                   <v-card-title>
-                    <span class="headline"><i class="fa fa-desktop"></i> {{ formTitle }}</span>
+                    <span class="headline"><v-icon> mdi-account-star-outline </v-icon> {{ formTitle }}</span>
                   </v-card-title>
 
                   <v-card-text>
@@ -80,11 +80,11 @@
                                 @blur="$v.tipo.$touch()"
                                 @input="$v.tipo.$touch()"
                                 dense
-                                label="Tipo de Atendimento"
+                                label="Alvo"
                                 name="tipo"
                                 outlined
-                                placeholder="Insira o tipo de atendimento"
-                                hint="Ex: 'Prova de vida'"
+                                placeholder="Insira o alvo"
+                                hint="Ex: 'Veterano'"
                                 required
                                 v-model="tipo"
                               >
@@ -105,7 +105,7 @@
                                 label="Om"
                                 name="om"
                                 outlined
-                                placeholder="Selecione a Om vinculada ao Tipo"
+                                placeholder="Selecione a Om vinculada ao publico alvo"
                                 required
                                 v-model="om"
                               ></v-select>
@@ -127,7 +127,7 @@
                               <v-row>
 
                                 <v-col>
-                                  <p><b>Cor de referencia do Tipo de atendiemento</b></p>
+                                  <p><b>Cor de referencia do publico alvo</b></p>
                                   <v-color-picker
                                     canvas-height="100"
                                     hide-inputs
@@ -189,7 +189,7 @@
               <v-card>
                 <v-card-title class="justify-center" primary-title><i class="fa fa-exclamation-triangle mr-4"></i> Você
                   tem
-                  certeza que quer excluir este tipo de atendimento? <i
+                  certeza que quer excluir este publico alvo? <i
                     class="fa fa-exclamation-triangle ml-4"></i></v-card-title>
                 <v-card-text>
                   <div class="text-center">Essa ação é irreverssível. Tenha certeza do que está fazendo.</div>
@@ -223,7 +223,7 @@
                 mdi-pencil
               </v-icon>
             </template>
-            <span>Editar Tipo</span>
+            <span>Editar publico alvo</span>
           </v-tooltip>
           <!--Excluir-->
           <v-tooltip top>
@@ -238,7 +238,7 @@
                 mdi-delete
               </v-icon>
             </template>
-            <span>Excluir Tipo</span>
+            <span>Excluir Publico Alvo</span>
           </v-tooltip>
         </template>
 
@@ -313,12 +313,12 @@ export default {
 
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'Novo Tipo de Atendimento' : 'Editar Tipo de Atendimento'
+      return this.editedIndex === -1 ? 'Novo Publico Alvo' : 'Editar Publico Alvo'
     },
     tipoErrors () {
       const errors = []
       if (!this.$v.tipo.$dirty) return errors
-      !this.$v.tipo.required && errors.push('O Campo "Tipo de Atendimento" não pode ficar em branco! ')
+      !this.$v.tipo.required && errors.push('O Campo "alvo" não pode ficar em branco! ')
       return errors
     },
     omErrors () {
@@ -380,20 +380,20 @@ export default {
     },
 
     deleteTipoConfirm () {
-      this.$http.delete('tipoatendimento/' + this.editedTipo.id)
+      this.$http.delete('publicoalvo/' + this.editedTipo.id)
       // eslint-disable-next-line no-return-assign
         .then(() => {
           this.tipos.splice(this.editedIndex, 1)
           this.resetFields()
           this.closeDelete()
           this.$toastr.s(
-            'Tipo de atendimento removido com sucesso', 'Sucesso!'
+            'Publico alvo removido com sucesso', 'Sucesso!'
           )
           this.resetFields()
         }, err => {
           console.log(err)
           this.$toastr.e(
-            'Não foi possível remover o Tipo de atendimento', 'Erro!'
+            'Não foi possível remover o publico alvo', 'Erro!'
           )
         })
     },
@@ -450,19 +450,19 @@ export default {
           objetoParaEnvio['cor'] = this.cor
           objetoParaEnvio['om_id'] = novaOm.id
 
-          this.$http.put('tipoatendimento/' + objetoParaEnvio.id, objetoParaEnvio)
+          this.$http.put('publicoalvo/' + objetoParaEnvio.id, objetoParaEnvio)
           // eslint-disable-next-line no-return-assign
             .then(() => {
               Object.assign(this.tipos[ajustaObjeto.edited_index], ajustaObjeto)
               this.$toastr.s(
-                'Tipo de atendimento alterado com sucesso', 'Sucesso!'
+                'Publico Alvo alterado com sucesso', 'Sucesso!'
               )
               this.resetFields()
               this.close()
             }, err => {
               console.log(err)
               this.$toastr.e(
-                'Não foi possível alterar o Tipo de atendimento', 'Erro!'
+                'Não foi possível alterar o Publico Alvo', 'Erro!'
               )
             })
         } else {
@@ -470,18 +470,18 @@ export default {
           objetoParaEnvio['tipo'] = this.tipo
           objetoParaEnvio['cor'] = this.cor
           objetoParaEnvio['om_id'] = this.om
-          this.$http.post('tipoatendimento', objetoParaEnvio)
+          this.$http.post('publicoalvo', objetoParaEnvio)
             .then(response => {
               this.tipos.push(response.data)
               this.$toastr.s(
-                'Tipo de atendimento criado com sucesso', 'Sucesso!'
+                'Publico Alvo criado com sucesso', 'Sucesso!'
               )
               this.resetFields()
               this.close()
             }, err => {
               console.log(err)
               this.$toastr.e(
-                'Não foi possível criar o Tipo de atendimento', 'Erro!'
+                'Não foi possível criar o Publico Alvo', 'Erro!'
               )
             })
         }

@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Usuarios from '../views/Usuarios.vue'
 import Paineis from '../views/Paineis'
 import TipoAtendimento from '../views/TiposAtendimentos'
+import PublicoAlvo from '../views/PublicosAlvos'
 import Guiches from '../views/Guiches'
 import Preferences from '../views/Preferences'
 import Home from '../views/Home.vue'
@@ -72,6 +73,14 @@ const routes = [
     path: '/tiposatendimento',
     name: 'tipoatendimento',
     component: TipoAtendimento,
+    meta: {
+      admin: true
+    }
+  },
+  {
+    path: '/publicoalvo',
+    name: 'publicoalvo',
+    component: PublicoAlvo,
     meta: {
       admin: true
     }

@@ -18,6 +18,7 @@ import VueConfirmDialog from 'vue-confirm-dialog'
 Vue.use(VueConfirmDialog)
 Vue.component('vue-confirm-dialog', VueConfirmDialog.default)
 Vue.use(Vuelidate)
+
 Vue.use(VueToastr, {
   defaultTimeout: 3000,
   defaultProgressBar: true,

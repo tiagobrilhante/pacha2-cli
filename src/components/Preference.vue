@@ -55,7 +55,7 @@
       >
         <v-card-text>
 
-          <!--alert atendimento normal-->
+          <!--sounds atendimento normal-->
           <v-alert border="top"
                    color="primary"
                    dark

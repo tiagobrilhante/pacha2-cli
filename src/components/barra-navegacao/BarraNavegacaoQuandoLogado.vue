@@ -97,6 +97,8 @@
       v-if="usuarioResetado"
     >
       <template v-slot:activator="{ on, attrs }" v-if="checaPermissaoChamador">
+
+        <!--Administração de chamadas-->
         <v-btn
           color="white"
           plain
@@ -108,6 +110,18 @@
             mdi-speaker-wireless
           </v-icon>
           Administração de Chamadas
+        </v-btn>
+
+        <!--demonstração de painel-->
+        <v-btn
+          color="white"
+          plain
+          to="/painelchamada"
+        >
+          <v-icon class="mr-5">
+            mdi-monitor-screenshot
+          </v-icon>
+          Painel de chamada
         </v-btn>
       </template>
       <!--list-->

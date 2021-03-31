@@ -4,9 +4,17 @@
 
       <!--Guiche e informações do painel-->
       <v-row>
+        <v-col></v-col>
         <v-col class="text-center">
           <h2>Guichê - {{ guicheNomeRef }} </h2>
           <h4>Painel IP - {{ guichePanelRef }}</h4>
+        </v-col>
+        <v-col class="text-lg-right">
+
+          <div class="pt-3">
+            <span class="digital">{{ meuRelogio }}</span>
+          </div>
+
         </v-col>
       </v-row>
 
@@ -223,28 +231,9 @@
 
                         <!--tipo atendimento e publico alvo-->
                         <v-container>
-                          <v-row class="pb-0 mb-0">
-                            <!--tipo de atendimento-->
-                            <v-col>
-                              <v-select
-                                :error-messages="tipoErrors"
-                                :items="listaTipos"
-                                @blur="$v.tipo.$touch()"
-                                @input="$v.tipo.$touch()"
-                                dense
-                                item-text="tipo"
-                                item-value="id"
-                                label="Tipos de atendimento"
-                                name="tipo"
-                                outlined
-                                placeholder="Selecione o tipo de atendimento"
-                                required
-                                v-model="tipo"
-                              ></v-select>
-                            </v-col>
-
+                          <v-row class="p-0 m-0">
                             <!--publico alvo-->
-                            <v-col>
+                            <v-col class="p-0 m-0">
                               <v-select
                                 :error-messages="publicoErrors"
                                 :items="listaPublicos"
@@ -262,6 +251,28 @@
                               ></v-select>
                             </v-col>
                           </v-row>
+                          <v-row class="p-0 m-0">
+                            <!--tipo de atendimento-->
+                            <v-col class="p-0 m-0">
+                              <v-select
+                                :error-messages="tipoErrors"
+                                :items="listaTipos"
+                                @blur="$v.tipo.$touch()"
+                                @input="$v.tipo.$touch()"
+                                chips
+                                dense
+                                item-text="tipo"
+                                item-value="id"
+                                label="Tipos de atendimento"
+                                multiple
+                                name="tipo"
+                                outlined
+                                placeholder="Selecione o tipo de atendimento"
+                                required
+                                v-model="tipo"
+                              ></v-select>
+                            </v-col>
+                          </v-row>
                         </v-container>
 
                       </v-alert>
@@ -275,7 +286,7 @@
                         block
                         class="mb-2"
                         color="yellow"
-                        height="115px"
+                        height="145px"
                         x-large
                       >
                         <v-icon class="mr-5">
@@ -289,7 +300,7 @@
                         block
                         class="mb-2"
                         color="green"
-                        height="115px"
+                        height="145px"
                         x-large
                       >
                         <v-icon class="mr-5">
@@ -303,7 +314,7 @@
                         block
                         class="mb-2"
                         color="red"
-                        height="115px"
+                        height="145px"
                         x-large
                       >
                         <v-icon class="mr-5">
@@ -686,7 +697,9 @@ export default {
     mostraTudo: false,
     textChamaGeral: 'Mostrar',
     statusTabelaGeral: 'Show',
-    colorBtnTableGeral: 'primary'
+    colorBtnTableGeral: 'primary',
+    meuRelogio: '',
+    lePrevision: ''
 
   }),
 
@@ -700,8 +713,9 @@ export default {
     await this.getGuicheChamadas()
     await this.getListaChamadasFeitas()
     this.loading = true
-    // tenho que travar a tela se existir alguma chamada não resolvida
-    // tenho que travar o setInterval
+    // tenho que travar o setInterval quando eu chamar alguem, ou quando não tiver os parametros
+
+    setInterval(this.relogio, 1000)
   },
 
   computed: {
@@ -748,7 +762,6 @@ export default {
         // retorna todos os publicos alvos disponiveis
         this.$http.get('publicoalvo/alltipos')
           .then(response => {
-            console.log(response)
             self.listaPublicos = response.data.data
           })
           .catch(erro => console.log(erro))
@@ -855,6 +868,7 @@ export default {
 
               this.meuConsole = false
               this.meuAtiva = true
+              clearInterval(this.lePrevision)
             }
           })
           .catch(erro => console.log(erro))
@@ -863,22 +877,28 @@ export default {
       }
     },
 
-    // retrona a previsão de chamadas
+    // retrona a previsão de chamadas com tic de tempo
     async getPrevisaoChamadas () {
       try {
-        setInterval(() => {
-          // Previsão de chamadas Normais e preferenciais
-          Promise.resolve(this.$http.get('chamadas/previsao')
-            .then(response => {
-              this.previsaoNormal = response.data[0]
-              this.previsaoPreferencial = response.data[1]
-              this.chamadasGerais = response.data[2]
-            })
-            .catch(erro => console.log(erro)))
-        }, 1000)
+        this.lePrevision = setInterval(this.getLePrevisao, 1000)
       } catch (e) {
         console.log(e)
       }
+    },
+
+    // consulta para retornar uma previsão
+    getLePrevisao () {
+      // Previsão de chamadas Normais e preferenciais
+      Promise.resolve(this.$http.get('chamadas/previsao')
+        .then(response => {
+          this.previsaoNormal = response.data[0]
+          this.previsaoPreferencial = response.data[1]
+          this.chamadasGerais = response.data[2]
+        })
+        .catch((e) => {
+          clearInterval(this.lePrevision)
+        })
+      )
     },
 
     // carrega os dados da minha tabela de chamada (baseada em guiche)
@@ -954,6 +974,8 @@ export default {
               this.chamadaAtivaConsoleDateTime = leData.toLocaleDateString('pt-br', options)
 
               this.chamadaAtivaConsoleId = response.data.id
+
+              clearInterval(this.lePrevision)
             })
             .catch(erro => console.log(erro))
 
@@ -985,6 +1007,8 @@ export default {
             // options.timeZoneName = 'short'
             this.chamadaAtivaConsoleDateTime = leData.toLocaleDateString('pt-br', options)
             this.chamadaAtivaConsoleId = response.data.id
+
+            clearInterval(this.lePrevision)
           })
           .catch(erro => console.log(erro))
 
@@ -995,21 +1019,25 @@ export default {
 
     // descarta uma chamada
     descarta () {
-      this.$http.get('chamadas/descarta/' + this.chamadaAtivaConsoleId)
-        .then(response => {
-          if (response.data.tipo === 'Normal') {
-            this.minhasChamadasNormais.push(response.data)
-          } else if (response.data.tipo === 'Preferencial') {
-            this.minhasChamadasPreferenciais.push(response.data)
-          } else {
-            this.minhasChamadasNominais.push(response.data)
-          }
-          this.tipo = ''
-          this.meuConsole = true
-          this.meuAtiva = false
-          this.dialogChamaNominal = false
-        })
-        .catch(erro => console.log(erro))
+      try {
+        this.$http.get('chamadas/descarta/' + this.chamadaAtivaConsoleId)
+          .then(response => {
+            if (response.data.tipo === 'Normal') {
+              this.minhasChamadasNormais.push(response.data)
+            } else if (response.data.tipo === 'Preferencial') {
+              this.minhasChamadasPreferenciais.push(response.data)
+            } else {
+              this.minhasChamadasNominais.push(response.data)
+            }
+            this.tipo = ''
+            this.meuConsole = true
+            this.meuAtiva = false
+            this.dialogChamaNominal = false
+            this.getPrevisaoChamadas()
+          })
+      } catch (e) {
+        console.log(e)
+      }
     },
 
     // finaliza uma chamada (sucesso)
@@ -1025,8 +1053,6 @@ export default {
         objetoEnvio['tipo_atendimento'] = this.$v.tipo.$model
         objetoEnvio['publico_alvo'] = this.$v.publico.$model
 
-        console.log(objetoEnvio)
-
         this.$http.post('chamadas/finaliza', objetoEnvio)
           .then(response => {
             if (response.data.tipo === 'Normal') {
@@ -1041,14 +1067,13 @@ export default {
             this.meuConsole = true
             this.meuAtiva = false
             this.dialogChamaNominal = false
+            this.getPrevisaoChamadas()
           })
           .catch(erro => console.log(erro))
       }
     },
 
     showGeralTable (status) {
-      console.log(status)
-
       if (status === 'Show') {
         this.textChamaGeral = 'Ocultar'
         this.statusTabelaGeral = 'Hide'
@@ -1067,12 +1092,100 @@ export default {
       this.$http.get('chamadas/rechamada/' + this.chamadaAtivaConsoleId)
         .then(response => {
           console.log(response)
-          // this.meuConsole = true
-          // this.meuAtiva = false
-          // this.dialogChamaNominal = false
+
+          let leData = new Date(response.data[0].created_at)
+          let options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric'
+          }
+          options.timeZone = 'America/Manaus'
+          // options.timeZoneName = 'short'
+          this.chamadaAtivaConsoleDateTime = leData.toLocaleDateString('pt-br', options)
+          this.chamadaAtivaConsoleId = response.data[0].id
+
+          if (typeof (response.data[0]) === 'object') {
+            if (response.data[1].tipo === 'Normal') {
+              this.minhasChamadasNormais.push(response.data[1])
+            } else if (response.data[1].tipo === 'Preferencial') {
+              this.minhasChamadasPreferenciais.push(response.data[1])
+            } else {
+              this.minhasChamadasNominais.push(response.data[1])
+            }
+
+            if (response.data[0].tipo === 'Nominal') {
+              this.chamadaAtivaConsoleNumero = response.data[0].nome_ref
+            } else {
+              this.chamadaAtivaConsoleNumero = response.data[0].numero_ref
+            }
+            this.chamadaAtivaConsoleTipo = response.data[0].tipo
+
+            this.chamadaAtivaConsoleChamador = response.data[0].chamador
+
+            clearInterval(this.lePrevision)
+          }
         })
         .catch(erro => console.log(erro))
+    },
+
+    // relógio
+    relogio () {
+      let dia = new Date()
+      let hora = dia.getHours()
+      let minutos = dia.getMinutes()
+      let segundos = dia.getSeconds()
+      let formatoHora = convertaFormato(hora)
+      hora = verificaHora(hora)
+
+      hora = addZero(hora)
+      minutos = addZero(minutos)
+      segundos = addZero(segundos)
+
+      this.meuRelogio = `${hora}:${minutos}:${segundos}${formatoHora}`
+
+      function convertaFormato (time) {
+        let formato = ' AM'
+        if (time >= 12) {
+          formato = ' PM'
+        }
+        return formato
+      }
+
+      function verificaHora (time) {
+        if (time > 12) {
+          time = time - 12
+        }
+        if (time === 0) {
+          time = 12
+        }
+        return time
+      }
+
+      function addZero (time) {
+        if (time < 10) {
+          time = '0' + time
+        }
+        return time
+      }
     }
   }
 }
 </script>
+
+<style>
+
+  @font-face {
+    font-family: 'Digital';
+    src: local('Digital'), url('../assets/fonts/digital-7.ttf');
+  }
+
+  .digital {
+    font-family: 'Digital';
+    color: black;
+    font-size: 40px;
+  }
+</style>

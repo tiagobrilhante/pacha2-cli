@@ -8,6 +8,7 @@ import Guiches from '../views/Guiches'
 import Preferences from '../views/Preferences'
 import Home from '../views/Home.vue'
 import HomeChamador from '../views/HomeChamador.vue'
+import PainelChamada from '../views/PainelChamada.vue'
 // import Reset from '../views/Reset.vue'
 import Login from '../views/Login.vue'
 import store from '@/store'
@@ -67,6 +68,14 @@ const routes = [
     component: Paineis,
     meta: {
       admin: true
+    }
+  },
+  {
+    path: '/painelchamada',
+    name: 'painel de chamada',
+    component: PainelChamada,
+    meta: {
+      publica: true
     }
   },
   {

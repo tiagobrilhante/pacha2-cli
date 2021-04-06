@@ -320,12 +320,14 @@ export default {
     cor: '',
     localizacao: '',
     defaultPanel: {
+      id: '',
       ip: '',
       om: '',
       cor: '',
       localizacao: ''
     },
     editedPanel: {
+      id: '',
       ip: '',
       om: '',
       cor: '',

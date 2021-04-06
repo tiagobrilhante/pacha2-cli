@@ -61,7 +61,7 @@
                         @click="chama('Preferencial')"
                         block
                         class="mb-2"
-                        color="warning"
+                        color="error"
                         x-large
                       >
                         <i class="fa fa-wheelchair mr-5"></i>
@@ -73,7 +73,7 @@
                         @click="preChamaNominal()"
                         block
                         class="mb-2"
-                        color="error"
+                        color="warning"
                         x-large
                       >
                         <v-icon class="mr-5">
@@ -795,9 +795,10 @@ export default {
         // Retorna o guiche
         this.$http.get('guiches/myguiche')
           .then(response => {
+            console.log(response)
             self.guiche = response.data
-            self.guicheNomeRef = response.data.nome_ref
-            self.guichePanelRef = response.data.ip + ' ( ' + response.data.localizacao + ' - ' + response.data.panel.om.sigla + ' )'
+            self.guicheNomeRef = response.data.nome_ref + ' ( ' + response.data.localizacao + ' - ' + response.data.ip + ' ) '
+            self.guichePanelRef = response.data.panel.ip + ' - ' + response.data.panel.om.sigla + ' ( ' + response.data.panel.localizacao + ' ) '
           })
           .catch(erro => console.log(erro))
       } catch (e) {

@@ -529,7 +529,7 @@ export default {
 
     getIcon (reset) {
       if (reset > 0) {
-        return ' mdi-sounds'
+        return 'mdi-account-alert-outline'
       } else {
         return 'mdi-check'
       }

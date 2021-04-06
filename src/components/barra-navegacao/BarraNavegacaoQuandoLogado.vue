@@ -96,7 +96,7 @@
       rounded="b-xl"
       v-if="usuarioResetado"
     >
-      <template v-slot:activator="{ on, attrs }" v-if="checaPermissaoChamador">
+      <template v-if="checaPermissaoChamador" v-slot:activator="{ on, attrs }">
 
         <!--Administração de chamadas-->
         <v-btn
@@ -112,17 +112,19 @@
           Administração de Chamadas
         </v-btn>
 
-        <!--demonstração de painel-->
+        <!--mensagens-->
         <v-btn
           color="white"
           plain
-          to="/painelchamada"
+          to="/mensagens"
+
         >
           <v-icon class="mr-5">
-            mdi-monitor-screenshot
+            mdi-comment-text
           </v-icon>
-          Painel de chamada
+          Mensagens
         </v-btn>
+
       </template>
       <!--list-->
       <v-list>

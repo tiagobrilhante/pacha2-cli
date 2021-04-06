@@ -54,6 +54,7 @@ export default {
   name: 'home',
   mixins: [logoutMixin],
   methods: {},
+  mounted () {},
   computed: {
 
     ...mapGetters(['usuarioLogado'])

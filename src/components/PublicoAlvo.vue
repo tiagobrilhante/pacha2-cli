@@ -184,7 +184,7 @@
               v-model="search"
             ></v-text-field>
 
-            <!--Dialog para deletar painel-->
+            <!--Dialog para deletar publico alvo-->
             <v-dialog max-width="800px" v-model="dialogDelete">
               <v-card>
                 <v-card-title class="justify-center" primary-title><i class="fa fa-exclamation-triangle mr-4"></i> Você

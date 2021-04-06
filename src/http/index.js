@@ -2,7 +2,8 @@ import axios from 'axios'
 import store from '@/store'
 
 const http = axios.create({
-  baseURL: 'http://localhost:8000/api/',
+  // baseURL: 'http://localhost:8000/api/',
+  baseURL: 'http://pachaapi.12rm.eb.mil.br/api/',
   headers: {
     'Accept': 'application/json',
     'Content': 'application/json'

@@ -1,13 +1,25 @@
 <template>
   <v-main>
     <v-container fluid v-if="loading">
-
+      <!--Guiche e informações do painel-->
       <v-row>
-        <!--Console de chamadas-->
-        <v-col>
+        <v-col class="text-left">
+          <h1> {{ PanelRef }}</h1>
+        </v-col>
+        <v-col class="text-lg-right">
 
+          <div class="pt-3">
+            <span class="digital">{{ meuRelogio }}</span>
+          </div>
+
+        </v-col>
+      </v-row>
+
+      <!--Painel de chamadas-->
+      <v-row>
+        <v-col>
           <v-card
-            color="red"
+            color="grey"
             elevation="10"
             outlined
             rounded="lg"
@@ -25,9 +37,10 @@
                     elevation="10"
                     outlined
                     rounded="lg"
+                    :color="chamado.cor"
                     v-for="chamado in chamadoPainel"
                   >
-                    <v-card-text class="text-left">
+                    <v-card-text class="text-left black--text piscante">
                       <v-row>
                         <v-col>
                           <p class="text-h1" v-if="chamado.numero_ref === null">{{ chamado.nome_ref }}</p>
@@ -71,23 +84,64 @@
         </v-col>
       </v-row>
 
+      <!--Mensagens-->
+      <v-row v-if="mostraMsg">
+        <v-col>
+          <v-card
+            class="pa-3"
+            color="grey"
+            elevation="10"
+            outlined
+            rounded="lg"
+          >
+
+            <v-card-text>
+              <v-row>
+                <v-col>
+                  <marquee-text :duration="20" :repeat="10">
+
+                    <span class="text-h4">
+                      {{ painelMensagem }}
+                    </span>
+
+                  </marquee-text>
+                </v-col>
+              </v-row>
+
+            </v-card-text>
+
+          </v-card>
+
+        </v-col>
+      </v-row>
+
     </v-container>
   </v-main>
 </template>
 
-<script>export default {
+<script>import MarqueeText from 'vue-marquee-text-component'
+
+export default {
+  components: {
+    MarqueeText
+  },
   data: () => ({
     PanelRef: '',
     chamadoPainel: [],
     loading: false,
     meuRelogio: '',
     lePrevision: '',
+    leMensagem: '',
     comChamado: false,
     idChamadaAtual: '',
+    painelMensagem: '',
+    callColor: '',
+    mostraMsg: false,
     isLoaded: false
   }),
   async mounted () {
     await this.getPrevisaoChamadas()
+    await this.getMensagens()
     await this.getPainelChamadas()
     this.loading = true
     // tenho que travar o setInterval quando eu chamar alguem, ou quando não tiver os parametros
@@ -120,6 +174,37 @@
       }
     },
 
+    // retrona as mensagens
+    async getMensagens () {
+      try {
+        this.leMensagens = setInterval(this.getLeMensagens, 5000)
+      } catch (e) {
+        console.log(e)
+      }
+    },
+
+    // consulta para retornar mensagens
+    getLeMensagens () {
+      Promise.resolve(this.$http.get('mensagens/painel')
+        .then(response => {
+          if (response.data.data.length > 0) {
+            this.mostraMsg = true
+          }
+
+          let stringCompleta = ' '
+
+          for (let i = 0; i < response.data.data.length; i++) {
+            stringCompleta = stringCompleta + response.data.data[i].mensagem + '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0'
+          }
+
+          this.painelMensagem = stringCompleta
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+      )
+    },
+
     // consulta para retornar uma previsão
     getLePrevisao () {
       // Previsão de chamadas Normais e preferenciais
@@ -131,9 +216,9 @@
           this.chamadoPainel = response.data
 
           if (this.idChamadaAtual === response.data[0].id) {
-            console.log('sem alteracao')
+            console.log('Sem Alteração')
           } else {
-            console.log('alterou')
+            console.log('Alteração encontrada')
             this.idChamadaAtual = response.data[0].id
             this.alert()
           }
@@ -203,7 +288,6 @@
     },
 
     alert () {
-      console.log('alert')
       let context = new AudioContext()
       let oscillator = context.createOscillator()
       oscillator.type = 'square'
@@ -226,5 +310,14 @@
     font-family: 'Digital';
     color: black;
     font-size: 40px;
+  }
+
+  @keyframes blink {
+    from { background-color: red; }
+    to { background-color: yellowgreen; }
+  }
+
+  .piscante {
+    animation: blink 1.02s 4 alternate;
   }
 </style>

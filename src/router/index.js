@@ -13,6 +13,7 @@ import PainelChamada from '../views/PainelChamada.vue'
 import Login from '../views/Login.vue'
 import store from '@/store'
 import Oms from '../views/Oms'
+import Mensagens from '../views/Mensagens'
 
 Vue.use(VueRouter)
 
@@ -68,6 +69,14 @@ const routes = [
     component: Paineis,
     meta: {
       admin: true
+    }
+  },
+  {
+    path: '/mensagens',
+    name: 'mensagens',
+    component: Mensagens,
+    meta: {
+      chamador: true
     }
   },
   {
